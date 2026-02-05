@@ -54,6 +54,7 @@
 #include "constants/battle_move_effects.h"
 #include "constants/battle_string_ids.h"
 #include "constants/battle_partner.h"
+#include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/item_effects.h"
 #include "constants/moves.h"
@@ -71,6 +72,7 @@
 #include "follower_npc.h"
 #include "load_save.h"
 #include "test/test_runner_battle.h"
+#include "nuzlocke.h"
 
 // Helper for accessing command arguments and advancing gBattlescriptCurrInstr.
 //
@@ -4321,6 +4323,14 @@ static void Cmd_tryfaintmon(void)
                 if (gBattleResults.playerFaintCounter < 255)
                     gBattleResults.playerFaintCounter++;
                 AdjustFriendshipOnBattleFaint(battler);
+                // NUZLOCKE: agenda soltar o mon do jogador após a batalha
+                if (!(gBattleTypeFlags & BATTLE_TYPE_LINK) && FlagGet(FLAG_SYS_NUZLOCKE_MODE))
+                {
+                    u8 slot = gBattlerPartyIndexes[battler];
+                    if (slot < PARTY_SIZE)
+                        Nuzlocke_QueueReleaseSlot(slot);
+                }
+
                 gSideTimers[B_SIDE_PLAYER].retaliateTimer = 2;
             }
             else

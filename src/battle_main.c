@@ -77,6 +77,8 @@
 #include "constants/weather.h"
 #include "cable_club.h"
 #include "test/test_runner_battle.h"
+#include "nuzlocke.h"
+
 
 extern const struct BgTemplate gBattleBgTemplates[];
 extern const struct WindowTemplate *const gBattleWindowTemplates[];
@@ -839,6 +841,10 @@ static void FindLinkBattleMaster(u8 numPlayers, u8 multiPlayerId)
 
 static void CB2_HandleStartBattle(void)
 {
+
+    //Nuzlocke
+    Nuzlocke_ClearReleaseQueue();
+
     u8 playerMultiplayerId;
     u8 enemyMultiplayerId;
 
@@ -5756,6 +5762,23 @@ static void WaitForEvoSceneToFinish(void)
 
 static void ReturnFromBattleToOverworld(void)
 {
+
+    //Nuzlocke
+    Nuzlocke_ProcessReleases_AfterBattle(gBattleTypeFlags);
+
+    // NUZLOCKE: Marca a área como "já teve encontro" após a batalha terminar
+    // Isso só deve acontecer em batalhas selvagens (não contra treinadores)
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+    {
+        // Batalha contra treinador - não marca a área
+    }
+    else if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
+    {
+        // Batalha selvagem - marca que esta área já teve um encontro
+        // Agora o jogador não poderá mais usar Pokébolas aqui
+        Nuzlocke_MarkAreaAsEncountered();
+    }
+
     if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
         RandomlyGivePartyPokerus(gPlayerParty);

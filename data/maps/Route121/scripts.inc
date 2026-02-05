@@ -5,6 +5,22 @@ Route121_EventScript_Woman::
 	msgbox Route121_Text_AheadLoomsMtPyre, MSGBOX_NPC
 	end
 
+Route121_EventScript_Barrier_Cameraman::
+	msgbox Route121_Text_DontDistractMe, MSGBOX_NPC
+	end
+
+Route121_EventScript_Barrier_Reporter::
+	msgbox Route121_Text_WereFilmingAMovie, MSGBOX_NPC
+	end
+
+Route121_EventScript_Barrier_Nurse::
+	msgbox Route121_Text_ThisSnorlax, MSGBOX_NPC
+	end
+
+Route121_EventScript_Barrier_Snorlax::
+	msgbox Route121_Text_SnorlaxDreaming, MSGBOX_SIGN
+	end
+
 Route121_EventScript_MtPyrePierSign::
 	msgbox Route121_Text_MtPyrePierSign, MSGBOX_SIGN
 	end
@@ -186,3 +202,17 @@ Route121_Text_SafariZoneSign:
 	.string "“Filled with rare POKéMON!”\n"
 	.string "SAFARI ZONE$"
 
+Route121_Text_DontDistractMe:
+	.string "Don't distract me!!!$"
+
+Route121_Text_WereFilmingAMovie:
+	.string "We're filming a movie here.$"
+
+Route121_Text_ThisSnorlax:
+	.string "This Snorlax suddenly fell asleep. \n"
+	.string "It will take a while for him to \n"
+	.string "wake up.$"
+
+Route121_Text_SnorlaxDreaming:
+	.string "What could this Snorlax be \n"
+	.string "dreaming about?$"

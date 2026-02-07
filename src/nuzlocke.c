@@ -6,6 +6,7 @@
 #include "constants/battle.h"
 #include "constants/flags.h"
 #include "constants/region_map_sections.h"
+#include "constants/species.h"
 #include "overworld.h"
 #include "event_data.h"
 #include "pokedex.h"
@@ -145,17 +146,87 @@ bool32 Nuzlocke_IsShinyPokemon(struct Pokemon *pokemon)
     return (xorValue < 8);
 }
 
-// Check if a species is already in the Pokedex (caught before)
-// Used for Dupe Clause - returns TRUE if species was already caught
-bool32 Nuzlocke_IsSpeciesDuplicate(u16 species)
+// Check if a species was caught - helper function
+static bool32 WasSpeciesCaught(u16 species)
 {
-    // Check the Pokedex to see if this species was caught before
     if (species == SPECIES_NONE || species == SPECIES_EGG)
         return FALSE;
     
-    // Get the National Pokedex number and check if it was caught
     u16 natDexNo = SpeciesToNationalPokedexNum(species);
     return GetSetPokedexFlag(natDexNo, FLAG_GET_CAUGHT) != 0;
+}
+
+// Find if any species in the evolution family was caught
+// Checks: pre-evolutions, current species, and all evolutions
+static bool32 IsEvolutionFamilyCaught(u16 species)
+{
+    u32 i;
+    const struct Evolution *evolutions;
+    
+    // Check if current species was caught
+    if (WasSpeciesCaught(species))
+        return TRUE;
+    
+    // Check all pre-evolutions by searching all species
+    for (i = 1; i < NUM_SPECIES; i++)
+    {
+        evolutions = GetSpeciesEvolutions(i);
+        if (evolutions == NULL)
+            continue;
+        
+        // Check if species 'i' evolves into our target species
+        for (u32 j = 0; evolutions[j].method != EVOLUTIONS_END; j++)
+        {
+            if (evolutions[j].targetSpecies == species)
+            {
+                // Found a pre-evolution! Check if it was caught
+                if (WasSpeciesCaught(i))
+                    return TRUE;
+                
+                // Also check grand-pre-evolutions (e.g. Bulbasaur when checking Venusaur)
+                if (IsEvolutionFamilyCaught(i))
+                    return TRUE;
+            }
+        }
+    }
+    
+    // Check all direct evolutions
+    evolutions = GetSpeciesEvolutions(species);
+    if (evolutions != NULL)
+    {
+        for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            u16 evoSpecies = evolutions[i].targetSpecies;
+            
+            // Check if this evolution was caught
+            if (WasSpeciesCaught(evoSpecies))
+                return TRUE;
+            
+            // Check evolutions of this evolution (e.g. Venusaur when checking Bulbasaur)
+            const struct Evolution *evoEvolutions = GetSpeciesEvolutions(evoSpecies);
+            if (evoEvolutions != NULL)
+            {
+                for (u32 j = 0; evoEvolutions[j].method != EVOLUTIONS_END; j++)
+                {
+                    if (WasSpeciesCaught(evoEvolutions[j].targetSpecies))
+                        return TRUE;
+                }
+            }
+        }
+    }
+    
+    return FALSE;
+}
+
+// Check if a species is already in the Pokedex (caught before)
+// Used for Dupe Clause - returns TRUE if species OR any member of evolution family was caught
+bool32 Nuzlocke_IsSpeciesDuplicate(u16 species)
+{
+    // Check the Pokedex to see if this species or its evolution family was caught before
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return FALSE;
+    
+    return IsEvolutionFamilyCaught(species);
 }
 
 // Check and register if current encounter is a dupe

@@ -2990,6 +2990,12 @@ void BeginBattleIntroDummy(void)
 void BeginBattleIntro(void)
 {
     BattleStartClearSetData();
+    
+    // Check for Dupe Clause at the start of wild battles
+    // Wild battle = not trainer battle and not link battle
+    if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && !(gBattleTypeFlags & BATTLE_TYPE_LINK))
+        Nuzlocke_CheckDupeEncounter();
+    
     gBattleCommunication[1] = 0;
     gBattleStruct->eventState.battleIntro = 0;
     gBattleMainFunc = DoBattleIntro;

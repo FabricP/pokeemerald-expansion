@@ -10,3 +10,10 @@ void Nuzlocke_ProcessReleases_AfterBattle(u32 battleTypeFlags);
 void Nuzlocke_MarkAreaAsEncountered(void);
 bool32 Nuzlocke_HasEncounteredInArea(void);
 bool32 Nuzlocke_CanCatchInArea(void);
+void Nuzlocke_CheckDupeEncounter(void);  // Check if encounter is dupe at battle start
+
+// Dupe Clause - check if species was already caught (via Pokedex)
+bool32 Nuzlocke_IsSpeciesDuplicate(u16 species);
+
+// Shiny Clause - check if pokemon is shiny
+bool32 Nuzlocke_IsShinyPokemon(struct Pokemon *pokemon);

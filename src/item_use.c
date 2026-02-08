@@ -1275,6 +1275,10 @@ bool32 CannotUseItemsInBattle(u16 itemId, struct Pokemon *mon)
         return TRUE;
     }
 
+    if (battleUsage == 0)
+    {
+        cannotUse = TRUE;
+    }
     // battleUsage checks
     switch (battleUsage)
     {

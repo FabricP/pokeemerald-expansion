@@ -4466,6 +4466,14 @@ BattleScript_FaintBattler::
 	trytrainerslidemsgfirstoff BS_FAINTED
 	return
 
+BattleScript_WildMonDroppedItem::
+	pause B_WAIT_TIME_SHORT
+	playse SE_SHOP
+	copybyte sBATTLER, gBattlerFainted
+	printstring STRINGID_WILDPKMNDROPITEM
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 BattleScript_GiveExp::
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_TARGET
@@ -6754,6 +6762,43 @@ BattleScript_IntimidateLoopIncrement:
 	restoreattacker
 	pause B_WAIT_TIME_MED
 	end3
+
+BattleScript_EnervateActivates::
+	savetarget
+	call BattleScript_AbilityPopUp
+	setbyte gBattlerTarget, 0
+BattleScript_EnervateLoop::
+	jumpiftargetally BattleScript_EnervateLoopIncrement
+	jumpifabsent BS_TARGET, BattleScript_EnervateLoopIncrement
+	jumpifvolatile BS_TARGET, VOLATILE_SUBSTITUTE, BattleScript_EnervateLoopIncrement
+	jumpifintimidateabilityprevented
+BattleScript_EnervateEffect::
+	copybyte sBATTLER, gBattlerAttacker
+	setstatchanger STAT_SPATK, 1, TRUE
+	statbuffchange BS_TARGET, STAT_CHANGE_NOT_PROTECT_AFFECTED | STAT_CHANGE_ALLOW_PTR, BattleScript_EnervateLoopIncrement
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_CHANGE, BattleScript_EnervateWontDecrease
+	printstring STRINGID_PKMNCUTS_SPATKWITH
+BattleScript_EnervateEffect_WaitString::
+	waitmessage B_WAIT_TIME_LONG
+	saveattacker
+	savetarget
+	copybyte sBATTLER, gBattlerTarget
+	call BattleScript_TryIntimidateHoldEffects
+	restoreattacker
+	restoretarget
+BattleScript_EnervateLoopIncrement::
+	addbyte gBattlerTarget, 1
+	jumpifbytenotequal gBattlerTarget, gBattlersCount, BattleScript_EnervateLoop
+	copybyte sBATTLER, gBattlerAttacker
+	destroyabilitypopup
+	restoretarget
+	restoreattacker
+	pause B_WAIT_TIME_MED
+	end3
+
+BattleScript_EnervateWontDecrease::
+	printstring STRINGID_STATSWONTDECREASE
+	goto BattleScript_EnervateEffect_WaitString
 
 BattleScript_IntimidatePrevented::
 	copybyte sBATTLER, gBattlerTarget

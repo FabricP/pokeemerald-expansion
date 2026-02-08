@@ -7806,6 +7806,8 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
 #if P_FAMILY_SMEARGLE
     [SPECIES_SMEARGLE] =
     {
+        //.itemCommon = ITEM_POTION,
+        //.itemRare   = ITEM_POTION,
         .baseHP        = 55,
         .baseAttack    = 20,
         .baseDefense   = 35,

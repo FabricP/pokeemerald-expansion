@@ -2412,4 +2412,11 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .cantBeSwapped = TRUE,
         .cantBeTraced = TRUE,
     },
+
+    [ABILITY_ENERVATE] =
+    {
+        .name = _("Enervate"),
+        .description = COMPOUND_STRING("Lowers the foe's Sp. Atk."),
+        .aiRating = 7,
+    },
 };

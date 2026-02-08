@@ -4339,6 +4339,22 @@ static void Cmd_tryfaintmon(void)
                     gBattleResults.opponentFaintCounter++;
                 gBattleResults.lastOpponentSpecies = GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, NULL);
                 gSideTimers[B_SIDE_OPPONENT].retaliateTimer = 2;
+                
+                #if B_WILD_ITEM_DROP == TRUE
+                // Se é uma batalha selvagem e o Pokémon tem um item segurado, dropa na bag
+                if (!(gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER)))
+                {
+                    u16 heldItem = GetMonData(GetBattlerMon(battler), MON_DATA_HELD_ITEM, NULL);
+                    if (heldItem != ITEM_NONE && CheckBagHasSpace(heldItem, 1))
+                    {
+                        AddBagItem(heldItem, 1);
+                        gLastUsedItem = heldItem;
+                        BattleScriptPushCursor();
+                        gBattlescriptCurrInstr = BattleScript_WildMonDroppedItem;
+                        return;
+                    }
+                }
+                #endif
             }
 
             if (gBattleMons[gBattlerTarget].volatiles.destinyBond)

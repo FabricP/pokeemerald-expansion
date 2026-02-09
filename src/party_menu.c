@@ -79,6 +79,7 @@
 #include "constants/party_menu.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "config/pokemon.h"
 
 enum {
     MENU_SUMMARY,
@@ -2892,6 +2893,40 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
             }
         }
     }
+
+#if P_HM_USE_FROM_BAG == TRUE
+    // If HM usage from bag is enabled, also check if the Pokemon can learn HMs from bag
+    for (j = 0; j != FIELD_MOVES_COUNT; j++)
+    {
+        u16 moveId = FieldMove_GetMoveId(j);
+        u16 itemId = GetTMHMItemIdFromMoveId(moveId);
+        
+        // Only check for HM items (HM01-HM08)
+        if (itemId >= ITEM_HM01 && itemId <= ITEM_HM08)
+        {
+            // Check if we already added this move (Pokemon already knows it)
+            bool32 alreadyAdded = FALSE;
+            for (i = 0; i < sPartyMenuInternal->numActions; i++)
+            {
+                if (sPartyMenuInternal->actions[i] == j + MENU_FIELD_MOVES)
+                {
+                    alreadyAdded = TRUE;
+                    break;
+                }
+            }
+            
+            // If not already added, check if HM is in bag and Pokemon can learn it
+            if (!alreadyAdded && CheckBagHasItem(itemId, 1) == TRUE)
+            {
+                u16 species = GetMonData(&mons[slotId], MON_DATA_SPECIES);
+                if (CanLearnTeachableMove(species, moveId) == TRUE)
+                {
+                    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
+                }
+            }
+        }
+    }
+#endif
 
     if (!InBattlePike())
     {

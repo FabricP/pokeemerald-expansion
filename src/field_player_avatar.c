@@ -34,6 +34,9 @@
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/trainer_types.h"
+#include "item.h"
+#include "pokemon.h"
+#include "config/pokemon.h"
 
 #define NUM_FORCED_MOVEMENTS 18
 #define NUM_ACRO_BIKE_COLLISIONS 5
@@ -1530,6 +1533,7 @@ bool8 PartyHasMonWithSurf(void)
 
     if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
     {
+        // First, check if any Pokémon knows Surf (vanilla behavior)
         for (i = 0; i < PARTY_SIZE; i++)
         {
             if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
@@ -1537,6 +1541,21 @@ bool8 PartyHasMonWithSurf(void)
             if (MonKnowsMove(&gPlayerParty[i], MOVE_SURF))
                 return TRUE;
         }
+
+#if P_HM_USE_FROM_BAG == TRUE
+        // If no Pokémon knows Surf, check if HM03 is in bag and any Pokémon can learn it
+        if (CheckBagHasItem(ITEM_HM03, 1) == TRUE)
+        {
+            for (i = 0; i < PARTY_SIZE; i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
+                if (species == SPECIES_NONE)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG, NULL) && CanLearnTeachableMove(species, MOVE_SURF) == TRUE)
+                    return TRUE;
+            }
+        }
+#endif
     }
     return FALSE;
 }

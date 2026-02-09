@@ -39,6 +39,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokedex.h"
+#include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
 #include "overworld.h"
@@ -61,6 +62,7 @@
 #include "malloc.h"
 #include "constants/event_objects.h"
 #include "constants/map_types.h"
+#include "config/pokemon.h"
 
 typedef u16 (*SpecialFunc)(void);
 typedef void (*NativeFunc)(struct ScriptContext *ctx);
@@ -2300,6 +2302,8 @@ bool8 ScrCmd_checkfieldmove(struct ScriptContext *ctx)
         return FALSE;
 
     move = FieldMove_GetMoveId(fieldMove);
+    
+    // First, check if any Pokémon knows the move (vanilla behavior)
     for (u32 i = 0; i < PARTY_SIZE; i++)
     {
         u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
@@ -2312,6 +2316,29 @@ bool8 ScrCmd_checkfieldmove(struct ScriptContext *ctx)
             break;
         }
     }
+
+#if P_HM_USE_FROM_BAG == TRUE
+    // If no Pokémon knows the move, check if HM is in bag and any Pokémon can learn it
+    if (gSpecialVar_Result == PARTY_SIZE)
+    {
+        u16 hmItem = GetTMHMItemIdFromMoveId(move);
+        if (hmItem != ITEM_NONE && CheckBagHasItem(hmItem, 1) == TRUE)
+        {
+            for (u32 i = 0; i < PARTY_SIZE; i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG, NULL) && CanLearnTeachableMove(species, move) == TRUE)
+                {
+                    gSpecialVar_Result = i;
+                    gSpecialVar_0x8004 = species;
+                    break;
+                }
+            }
+        }
+    }
+#endif
 
     return FALSE;
 }

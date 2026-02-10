@@ -74,6 +74,7 @@ enum
 #define TAG_BUG_INDICATOR_TILE          0xD782
 #define TAG_GHOST_INDICATOR_TILE        0xD783
 #define TAG_STEEL_INDICATOR_TILE        0xD784
+#define TAG_NUZLOCKE_INDICATOR_TILE     0xD785
 // empty spot for TYPE_MYSTERY
 #define TAG_FIRE_INDICATOR_TILE         0xD786
 #define TAG_WATER_INDICATOR_TILE        0xD787
@@ -91,6 +92,7 @@ enum
 #define TAG_MEGA_INDICATOR_PAL          0xD778
 #define TAG_MISC_INDICATOR_PAL          0xD779 // Alpha, Omega, and Dynamax indicators use the same palette as each of them only uses 4 different colors.
 #define TAG_TERA_INDICATOR_PAL          0xD77A
+#define TAG_NUZLOCKE_INDICATOR_PAL      0xD77B
 
 enum
 {

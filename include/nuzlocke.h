@@ -1,7 +1,8 @@
 // include/nuzlocke.h
 #pragma once
 #include "global.h"
-
+// Global variables
+extern bool32 gNuzlockeDupeEncountered;  // Tracks if current encounter is a dupe
 void Nuzlocke_ClearReleaseQueue(void);
 void Nuzlocke_QueueReleaseSlot(u8 slot);
 void Nuzlocke_ProcessReleases_AfterBattle(u32 battleTypeFlags);

@@ -909,9 +909,11 @@ static void UpdateLvlInHealthbox(u8 healthboxSpriteId, u8 lvl)
     u32 xPos;
     u8 *objVram;
     u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
+    u32 palTag = GetIndicatorPalTag(battler);
 
     // Don't print Lv char if mon has a gimmick with an indicator active.
-    if (GetIndicatorPalTag(battler) != TAG_NONE)
+    // Exception: Nuzlocke dupe indicator should NOT hide "Lv"
+    if (palTag != TAG_NONE && palTag != TAG_NUZLOCKE_INDICATOR_PAL)
     {
         objVram = ConvertIntToDecimalStringN(text, lvl, STR_CONV_MODE_LEFT_ALIGN, 3);
         xPos = 5 * (3 - (objVram - (text + 2))) - 1;
@@ -925,7 +927,12 @@ static void UpdateLvlInHealthbox(u8 healthboxSpriteId, u8 lvl)
 
         objVram = ConvertIntToDecimalStringN(text + 2, lvl, STR_CONV_MODE_LEFT_ALIGN, 3);
         xPos = 5 * (3 - (objVram - (text + 2)));
-        UpdateIndicatorVisibilityAndType(healthboxSpriteId, TRUE);
+        
+        // Update indicator visibility - show for nuzlocke dupe, hide for others
+        if (palTag == TAG_NUZLOCKE_INDICATOR_PAL)
+            UpdateIndicatorVisibilityAndType(healthboxSpriteId, FALSE);
+        else
+            UpdateIndicatorVisibilityAndType(healthboxSpriteId, TRUE);
     }
 
     windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(text, xPos, 3, 2, &windowId);

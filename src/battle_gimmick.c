@@ -13,6 +13,7 @@
 #include "sprite.h"
 #include "util.h"
 #include "test_runner.h"
+#include "nuzlocke.h"
 
 #include "data/gimmicks.h"
 
@@ -270,6 +271,7 @@ void LoadIndicatorSpritesGfx(void)
     LoadSpritePalette(&sSpritePalette_MiscIndicator);
     LoadSpritePalette(&sSpritePalette_MegaIndicator);
     LoadSpritePalette(&sSpritePalette_TeraIndicator);
+    LoadSpritePalette(&sSpritePalette_NuzlockeIndicator);
 }
 
 static void SpriteCb_GimmickIndicator(struct Sprite *sprite)
@@ -288,6 +290,10 @@ static inline u32 GetIndicatorSpriteId(u32 healthboxId)
 
 const u32 *GetIndicatorSpriteSrc(u32 battler)
 {
+    // Nuzlocke Dupe indicator - show pokéball for dupes
+    if (!IsOnPlayerSide(battler) && gNuzlockeDupeEncountered)
+        return (u32 *)&sNuzlockeIndicatorGfx;
+    
     u32 gimmick = GetActiveGimmick(battler);
 
     if (IsBattlerPrimalReverted(battler))
@@ -313,6 +319,10 @@ const u32 *GetIndicatorSpriteSrc(u32 battler)
 
 u32 GetIndicatorPalTag(u32 battler)
 {
+    // Nuzlocke Dupe indicator - use ball_display palette for pokéball
+    if (!IsOnPlayerSide(battler) && gNuzlockeDupeEncountered)
+        return TAG_NUZLOCKE_INDICATOR_PAL;
+    
     u32 gimmick = GetActiveGimmick(battler);
     if (IsBattlerPrimalReverted(battler))
         return TAG_MISC_INDICATOR_PAL;
@@ -338,12 +348,16 @@ void UpdateIndicatorVisibilityAndType(u32 healthboxId, bool32 invisible)
         sprite->oam.paletteNum = IndexOfSpritePaletteTag(palTag);
         sprite->invisible = invisible;
 
-        u32 *dst = (u32 *)(OBJ_VRAM0 + TILE_SIZE_4BPP * GetSpriteTileStartByTag(BATTLER_INDICATOR_TAG + battler));
+        // Only copy tile data if the sprite is visible (avoid unnecessary VRAM writes that overwrite other tiles)
+        if (!invisible)
+        {
+            u32 *dst = (u32 *)(OBJ_VRAM0 + TILE_SIZE_4BPP * GetSpriteTileStartByTag(BATTLER_INDICATOR_TAG + battler));
 
-        const u32 *src = GetIndicatorSpriteSrc(battler);
+            const u32 *src = GetIndicatorSpriteSrc(battler);
 
-        for (u32 i = 0; i < INDICATOR_SIZE / 4; i++)
-            dst[i] = src[i];
+            for (u32 i = 0; i < INDICATOR_SIZE / 4; i++)
+                dst[i] = src[i];
+        }
     }
     else // in case of error
     {
@@ -373,9 +387,9 @@ void UpdateIndicatorLevelData(u32 healthboxId, u32 level)
 static const s8 sIndicatorPositions[][2] =
 {
     [B_POSITION_PLAYER_LEFT] = {49, -9},
-    [B_POSITION_OPPONENT_LEFT] = {40, -9},
+    [B_POSITION_OPPONENT_LEFT] = {52, -9},  // Adjusted to avoid overlap with Lv text
     [B_POSITION_PLAYER_RIGHT] = {48, -9},
-    [B_POSITION_OPPONENT_RIGHT] = {40, -9},
+    [B_POSITION_OPPONENT_RIGHT] = {52, -9},  // Adjusted to avoid overlap with Lv text
 };
 
 void CreateIndicatorSprite(u32 battler)
@@ -389,7 +403,10 @@ void CreateIndicatorSprite(u32 battler)
     x = sIndicatorPositions[position][0];
     y += sIndicatorPositions[position][1];
 
-    LoadSpriteSheet(&sBattler_GimmickSpritesheets[battler]);
+    // Only load spritesheet if not already loaded by another indicator
+    if (GetSpriteTileStartByTag(BATTLER_INDICATOR_TAG + battler) == 0xFFFF)
+        LoadSpriteSheet(&sBattler_GimmickSpritesheets[battler]);
+    
     spriteId = CreateSprite(&(sSpriteTemplate_BattlerIndicators[battler]), 0, y, 0);
     gBattleStruct->gimmick.indicatorSpriteId[battler] = spriteId;
     gSprites[spriteId].tBattler = battler;

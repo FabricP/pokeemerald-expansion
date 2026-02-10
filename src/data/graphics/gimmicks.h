@@ -95,6 +95,10 @@ static const u8 ALIGNED(4) sDarkIndicatorGfx[] = INCBIN_U8("graphics/battle_inte
 static const u8 ALIGNED(4) sFairyIndicatorGfx[] = INCBIN_U8("graphics/battle_interface/fairy_indicator.4bpp");
 static const u8 ALIGNED(4) sStellarIndicatorGfx[] = INCBIN_U8("graphics/battle_interface/stellar_indicator.4bpp");
 
+// Nuzlocke dupe indicator (pokéball)
+static const u8 ALIGNED(4) sNuzlockeIndicatorGfx[] = INCBIN_U8("graphics/battle_interface/nuzlocke_duplicate.4bpp");
+static const u16 sNuzlockeIndicatorPal[] = INCBIN_U16("graphics/battle_interface/ball_display.gbapal"); // Use ball display palette
+
 static const u16 sMiscIndicatorPal[] = INCBIN_U16("graphics/battle_interface/misc_indicator.gbapal"); // has room for more colors
 static const u16 sMegaIndicatorPal[] = INCBIN_U16("graphics/battle_interface/mega_indicator.gbapal");
 static const u16 sTeraIndicatorPal[] = INCBIN_U16("graphics/battle_interface/tera_indicator.gbapal");
@@ -127,6 +131,7 @@ static const u8 *const sTeraIndicatorDataPtrs[] =
 static const struct SpritePalette sSpritePalette_MiscIndicator = {sMiscIndicatorPal, TAG_MISC_INDICATOR_PAL};
 static const struct SpritePalette sSpritePalette_MegaIndicator = {sMegaIndicatorPal, TAG_MEGA_INDICATOR_PAL};
 static const struct SpritePalette sSpritePalette_TeraIndicator = {sTeraIndicatorPal, TAG_TERA_INDICATOR_PAL};
+static const struct SpritePalette sSpritePalette_NuzlockeIndicator = {sNuzlockeIndicatorPal, TAG_NUZLOCKE_INDICATOR_PAL};
 
 static const struct OamData sOamData_GimmickIndicator =
 {

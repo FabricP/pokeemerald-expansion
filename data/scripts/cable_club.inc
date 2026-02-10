@@ -260,8 +260,8 @@ CableClub_EventScript_SelectCableClubRoom::
 	goto_if_set FLAG_VISITED_MAUVILLE_CITY, CableClub_EventScript_CableClubUnlockedRecordCorner
 	multichoice 0, 0, MULTI_CABLE_CLUB_NO_RECORD_MIX, FALSE
 	switch VAR_RESULT
-	case 0, CableClub_EventScript_TradeCenter
-	case 1, CableClub_EventScript_Colosseum
+	case 0, CableClub_EventScript_Colosseum
+	case 1, CableClub_EventScript_TradeCenter
 	case 2, CableClub_EventScript_AbortLink
 	case MULTI_B_PRESSED, CableClub_EventScript_AbortLink
 	end
@@ -269,8 +269,8 @@ CableClub_EventScript_SelectCableClubRoom::
 CableClub_EventScript_CableClubUnlockedRecordCorner::
 	multichoice 0, 0, MULTI_CABLE_CLUB_WITH_RECORD_MIX, FALSE
 	switch VAR_RESULT
-	case 0, CableClub_EventScript_TradeCenter
-	case 1, CableClub_EventScript_Colosseum
+	case 0, CableClub_EventScript_Colosseum
+	case 1, CableClub_EventScript_TradeCenter
 	case 2, CableClub_EventScript_RecordCorner
 	case 3, CableClub_EventScript_AbortLink
 	case MULTI_B_PRESSED, CableClub_EventScript_AbortLink

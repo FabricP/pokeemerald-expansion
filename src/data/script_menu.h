@@ -458,8 +458,8 @@ static const struct MenuAction MultichoiceList_Tent[] =
 
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
-    {gText_TradeCenter},
     {gText_Colosseum},
+    {gText_TradeCenter},
     {gText_RecordCorner},
     {gText_Exit},
 };
@@ -482,16 +482,16 @@ static const struct MenuAction MultichoiceList_BattleMode[] =
 
 static const struct MenuAction MultichoiceList_LinkServicesNoRecord[] =
 {
-    {gText_TradeCenter},
     {gText_Colosseum},
+    {gText_TradeCenter},
     {gText_BerryCrush3},
     {gText_Exit},
 };
 
 static const struct MenuAction MultichoiceList_LinkServicesAll[] =
 {
-    {gText_TradeCenter},
     {gText_Colosseum},
+    {gText_TradeCenter},
     {gText_RecordCorner},
     {gText_BerryCrush3},
     {gText_Exit},
@@ -499,8 +499,8 @@ static const struct MenuAction MultichoiceList_LinkServicesAll[] =
 
 static const struct MenuAction MultichoiceList_LinkServicesNoRecordBerry[] =
 {
-    {gText_TradeCenter},
     {gText_Colosseum},
+    {gText_TradeCenter},
     {gText_Exit},
 };
 

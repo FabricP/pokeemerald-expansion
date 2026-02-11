@@ -7,20 +7,17 @@
 
 u32 GetCurrentLevelCap(void)
 {
-    // EDITE AQUI: Configure o level cap para cada badge
-    // Formato: {FLAG_DA_BADGE, LEVEL_CAP}
-    // O Pokémon para de ganhar EXP ao atingir o level cap até você derrotar o ginásio correspondente
     static const u32 sLevelCapFlagMap[][2] =
     {
-        {FLAG_BADGE01_GET, 15},  // 1ª Badge (Roxanne) - Cap Level 15
-        {FLAG_BADGE02_GET, 19},  // 2ª Badge (Brawly)  - Cap Level 19
-        {FLAG_BADGE03_GET, 24},  // 3ª Badge (Wattson) - Cap Level 24
-        {FLAG_BADGE04_GET, 29},  // 4ª Badge (Flannery) - Cap Level 29
-        {FLAG_BADGE05_GET, 31},  // 5ª Badge (Norman)  - Cap Level 31
-        {FLAG_BADGE06_GET, 33},  // 6ª Badge (Winona)  - Cap Level 33
-        {FLAG_BADGE07_GET, 42},  // 7ª Badge (Tate & Liza) - Cap Level 42
-        {FLAG_BADGE08_GET, 46},  // 8ª Badge (Wallace) - Cap Level 46
-        {FLAG_IS_CHAMPION, 58},  // Após ser Campeão - Cap Level 58
+        {FLAG_BADGE01_GET, 14},  // 1ª Badge (Roxanne) - Cap Level 14
+        {FLAG_BADGE02_GET, 18},  // 2ª Badge (Brawly)  - Cap Level 18
+        {FLAG_BADGE03_GET, 22},  // 3ª Badge (Wattson) - Cap Level 22
+        {FLAG_BADGE04_GET, 27},  // 4ª Badge (Flannery) - Cap Level 27
+        {FLAG_BADGE05_GET, 32},  // 5ª Badge (Norman)  - Cap Level 32
+        {FLAG_BADGE06_GET, 38},  // 6ª Badge (Winona)  - Cap Level 38
+        {FLAG_BADGE07_GET, 43},  // 7ª Badge (Tate & Liza) - Cap Level 43
+        {FLAG_BADGE08_GET, 48},  // 8ª Badge (Wallace) - Cap Level 48
+        {FLAG_IS_CHAMPION, 61},  // Após ser Campeão - Cap Level 61
     };
 
     u32 i;

@@ -11959,7 +11959,7 @@
           "map": "MAP_OLDALE_TOWN",
           "base_label": "gOldaleTown",
           "land_mons": {
-            "encounter_rate": 10,
+            "encounter_rate": 20,
             "mons": [
               {
                 "min_level": 2,
@@ -12028,7 +12028,7 @@
           "map": "MAP_FALLARBOR_TOWN",
           "base_label": "gFallarborTown",
           "land_mons": {
-            "encounter_rate": 10,
+            "encounter_rate": 20,
             "mons": [
               {
                 "min_level": 14,

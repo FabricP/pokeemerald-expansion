@@ -10,6 +10,7 @@
 #include "overworld.h"
 #include "event_data.h"
 #include "pokedex.h"
+#include "item.h"
 
 EWRAM_DATA u8 gNuzlockeReleaseSlots[PARTY_SIZE];
 EWRAM_DATA bool32 gNuzlockeDupeEncountered;  // Tracks if current encounter is a dupe
@@ -68,7 +69,17 @@ void Nuzlocke_ProcessReleases_AfterBattle(u32 battleTypeFlags)
     for (i = PARTY_SIZE - 1; i >= 0; i--)
     {
         if (gNuzlockeReleaseSlots[i])
+        {
+            u16 heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+
+            if (heldItem != ITEM_NONE)
+            {
+                if (!AddBagItem(heldItem, 1))
+                    AddPCItem(heldItem, 1);
+            }
+
             ZeroMonData(&gPlayerParty[i]);
+        }
     }
 
     CompactPartySlots();

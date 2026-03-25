@@ -2174,6 +2174,10 @@ static enum MoveCanceler CancelerTruant(struct BattleContext *ctx)
 {
     if (GetBattlerAbility(ctx->battlerAtk) == ABILITY_TRUANT && gDisableStructs[ctx->battlerAtk].truantCounter)
     {
+        // Allow Slack Off to be used even during Truant's loafing turns
+        if (ctx->currentMove == MOVE_SLACK_OFF)
+            return MOVE_STEP_SUCCESS;
+        
         CancelMultiTurnMoves(ctx->battlerAtk, SKY_DROP_ATTACKCANCELER_CHECK);
         gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_LOAFING;

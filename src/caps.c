@@ -13,7 +13,7 @@ u32 GetCurrentLevelCap(void)
         {FLAG_BADGE02_GET, 18},  // 2ª Badge (Brawly)  - Cap Level 18
         {FLAG_BADGE03_GET, 22},  // 3ª Badge (Wattson) - Cap Level 22
         {FLAG_BADGE04_GET, 27},  // 4ª Badge (Flannery) - Cap Level 27
-        {FLAG_BADGE05_GET, 32},  // 5ª Badge (Norman)  - Cap Level 32
+        {FLAG_BADGE05_GET, 33},  // 5ª Badge (Norman)  - Cap Level 33
         {FLAG_BADGE06_GET, 38},  // 6ª Badge (Winona)  - Cap Level 38
         {FLAG_BADGE07_GET, 43},  // 7ª Badge (Tate & Liza) - Cap Level 43
         {FLAG_BADGE08_GET, 48},  // 8ª Badge (Wallace) - Cap Level 48

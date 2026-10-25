@@ -58,7 +58,7 @@
     },
     {
       "id": "MAPSEC_PETALBURG_CITY",
-      "name": "PETALBURG CITY",
+      "name": "PETALBURG",
       "x": 1,
       "y": 9,
       "width": 1,
@@ -1228,6 +1228,14 @@
       "name": "TRAINER HILL",
       "x": 8,
       "y": 4,
+      "width": 1,
+      "height": 1
+    },
+    {
+      "id": "MAPSEC_MAMA_ISLAND",
+      "name": "MAMA ISLAND",
+      "x": 27,
+      "y": 10,
       "width": 1,
       "height": 1
     }

@@ -17,6 +17,11 @@
       "map": "MAP_ROUTE128",
       "offset": 40,
       "direction": "left"
+    },
+    {
+      "map": "MAP_MAMA_ISLAND",
+      "offset": 11,
+      "direction": "down"
     }
   ],
   "object_events": [],

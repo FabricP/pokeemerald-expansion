@@ -1,0 +1,26 @@
+{
+  "id": "MAP_MAMA_ISLAND",
+  "name": "MamaIsland",
+  "layout": "LAYOUT_MAMA_ISLAND",
+  "music": "MUS_B_PYRAMID",
+  "region_map_section": "MAPSEC_MAMA_ISLAND",
+  "requires_flash": false,
+  "weather": "WEATHER_SANDSTORM",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_PHOEBE",
+  "connections": [
+    {
+      "map": "MAP_EVER_GRANDE_CITY",
+      "offset": -11,
+      "direction": "up"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": []
+}

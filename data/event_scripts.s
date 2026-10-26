@@ -1165,3 +1165,7 @@ EventScript_VsSeekerChargingDone::
 	.include "data/scripts/apricorn_tree.inc"
 
 	.include "data/maps/MamaIsland/scripts.inc"
+
+	.include "data/maps/MamaIsland_GoblinStore_1F/scripts.inc"
+
+	.include "data/maps/MamaIsland_GoblinStore_2F/scripts.inc"

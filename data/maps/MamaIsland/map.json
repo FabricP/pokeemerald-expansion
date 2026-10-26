@@ -15,12 +15,29 @@
   "connections": [
     {
       "map": "MAP_EVER_GRANDE_CITY",
-      "offset": -11,
+      "offset": -5,
       "direction": "up"
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 31,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_MAMA_ISLAND_GOBLIN_STORE_1F",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 29,
+      "y": 16,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "MamaIsland_EventScript_GoblinShopSign"
+    }
+  ]
 }

@@ -16873,3 +16873,99 @@ Double Battle: No
 Kyogre
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_FABAS ===
+Name: FABAS
+Class: Bug Catcher
+Pic: Bug Maniac
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Scyther (M)
+Level: 20
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+
+Golisopod (M)
+Level: 20
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_MAMA ===
+Name: MAMA
+Class: Expert
+Pic: Steven
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Furia (Rattata) (M)
+Level: 100
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_GUSTAVS ===
+Name: GUSTAVS
+Class: Expert
+Pic: Hiker
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Vesgo (Pidgey) (M)
+Level: 100
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_MOTT ===
+Name: MOTT
+Class: Expert
+Pic: Collector
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Gengar (M)
+Level: 10
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_DUDU ===
+Name: DUDU
+Class: Youngster
+Pic: Camper
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Slowpoke
+Level: 10
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_BIZZU ===
+Name: BIZZU
+Class: Pokemaniac
+Pic: Pokemaniac
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Magcargo
+Level: 10
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_RUBIN===
+Name: RUBIN
+Class: Youngster
+Pic: Rich Boy
+Gender: Male
+Music: Male
+Double Battle: Yes
+AI: Check Bad Move
+
+Glalie
+Level: 10
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe

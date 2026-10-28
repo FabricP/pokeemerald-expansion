@@ -1,13 +1,81 @@
 MamaIsland_GoblinStore_1F_MapScripts::
 	.byte 0
 
+MamaIsland_GoblinStore_1F_EventScript_Pedrinho::
+	lock
+	faceplayer
+	message MamaIsland_GoblinStore_1F_Text_PedrinhoOpening
+	waitmessage
+	pokemart MamaIsland_GoblinStore_1F_Pokemart
+	msgbox MamaIsland_GoblinStore_1F_Text_PedrinhoClosing, MSGBOX_DEFAULT
+	release
+	end
+
+MamaIsland_GoblinStore_1F_Text_PedrinhoOpening:
+	.string "Pedrinho inicio$"
+
+MamaIsland_GoblinStore_1F_Text_PedrinhoClosing:
+	.string "Pedrinho fim$"
+
+	.align 2
+MamaIsland_GoblinStore_1F_Pokemart:
+	.2byte ITEM_MASTER_BALL
+	pokemartlistend
+
+
+MamaIsland_GoblinStore_1F_EventScript_Poster1::
+	msgbox MamaIsland_GoblinStore_1F_Text_Poster1, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Poster1:
+	.string "A poster about a magical game!\n"
+	.string "It seems complex.$"
+
+MamaIsland_GoblinStore_1F_EventScript_Poster2::
+	msgbox MamaIsland_GoblinStore_1F_Text_Poster2, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Poster2:
+	.string "A poster about a linked fissure!\n"
+	.string "This one looks fun!$"
+
+MamaIsland_GoblinStore_1F_EventScript_Display::
+	msgbox MamaIsland_GoblinStore_1F_Text_Display, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Display:
+	.string "A display showing the results of the\n"
+	.string "matches.$"
+
+MamaIsland_GoblinStore_1F_EventScript_Clock::
+	msgbox MamaIsland_GoblinStore_1F_Text_Clock, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Clock:
+	.string "Time flies when we’re having fun!$"
+
+MamaIsland_GoblinStore_1F_EventScript_Treats::
+	msgbox MamaIsland_GoblinStore_1F_Text_Treats, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Treats:
+	.string "A shelf full of delicious treats!$"
+
+MamaIsland_GoblinStore_1F_EventScript_Fridge::
+	msgbox MamaIsland_GoblinStore_1F_Text_Fridge, MSGBOX_SIGN
+	end
+
+MamaIsland_GoblinStore_1F_Text_Fridge:
+	.string "Do they have my favorite drink?$"
+
+
 MamaIsland_GoblinStore_1F_EventScript_Fabas::
 	trainerbattle_single TRAINER_GOBLIN_STORE_FABAS, MamaIsland_GoblinStore_1F_Text_FabasIntro, MamaIsland_GoblinStore_1F_Text_FabasDefeat
 	msgbox MamaIsland_GoblinStore_1F_Text_FabasPostBattle, MSGBOX_AUTOCLOSE
 	end
 
 MamaIsland_GoblinStore_1F_Text_FabasIntro:
-	.string "Where is my Guaraviton?\p"
+	.string "Where is my natural guarana?\p"
 	.string "Hey you!\n"
 	.string "Do you dare challenge me?\p"
 	.string "Don't scream!!$"
@@ -16,8 +84,8 @@ MamaIsland_GoblinStore_1F_Text_FabasDefeat:
 	.string "Oh man, I thought I was going to win.$"
 
 MamaIsland_GoblinStore_1F_Text_FabasPostBattle:
-	.string "You only beat me because nature\n"
-	.string "nerfed me.$"
+	.string "You only beat me because I was nerfed\n"
+	.string "by the nature.$"
 
 
 MamaIsland_GoblinStore_1F_EventScript_Mama::

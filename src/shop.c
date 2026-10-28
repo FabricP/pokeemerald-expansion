@@ -37,6 +37,7 @@
 #include "constants/decorations.h"
 #include "constants/event_objects.h"
 #include "constants/items.h"
+#include "constants/maps.h"
 #include "constants/metatile_behaviors.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -46,6 +47,7 @@
 
 #define MAX_ITEMS_SHOWN 8
 #define SHOP_MENU_PALETTE_ID 12
+#define HEART_SCALE_SHOP_PRICE 2
 
 enum {
     WIN_BUY_SELL_QUIT,
@@ -114,6 +116,59 @@ static EWRAM_DATA u8 (*sItemNames)[ITEM_NAME_LENGTH + 2] = {0};
 static EWRAM_DATA u8 sPurchaseHistoryId = 0;
 EWRAM_DATA struct ItemSlot gMartPurchaseHistory[SMARTSHOPPER_NUM_ITEMS] = {0};
 
+static const u8 sText_YouDontHaveEnoughHeartScales[] = _("You don't have enough\nHeart Scales.{PAUSE_UNTIL_PRESS}");
+static const u8 sText_YouWantedVar1ThatllBeVar2HeartScales[] = _("You wanted {STR_VAR_1}?\nThat'll be {STR_VAR_2} Heart Scales. Will that be okay?");
+static const u8 sText_Var1AndYouWantedVar2HeartScales[] = _("{STR_VAR_1}? And you wanted {STR_VAR_2}?\nThat'll be {STR_VAR_3} Heart Scales.");
+static const u8 sText_HeartScalePrice[] = _("{STR_VAR_1} SCALES");
+static const u8 sText_HeartScaleBalance[] = _("SCALES: {STR_VAR_1}");
+static const u8 sText_HeartScaleQuantityPrice[] = _("{STR_VAR_1} SCALES");
+
+static bool8 IsHeartScaleMart(void)
+{
+    return gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_MAMA_ISLAND_GOBLIN_STORE_1F)
+        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_MAMA_ISLAND_GOBLIN_STORE_1F);
+}
+
+static u32 GetShopItemUnitPrice(u16 itemId)
+{
+    if (IsHeartScaleMart())
+        return HEART_SCALE_SHOP_PRICE;
+    if (sMartInfo.martType == MART_TYPE_NORMAL)
+        return GetItemPrice(itemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT);
+    return gDecorations[itemId].price;
+}
+
+static u32 GetShopCurrency(void)
+{
+    if (IsHeartScaleMart())
+        return CountTotalItemQuantityInBag(ITEM_HEART_SCALE);
+    return GetMoney(&gSaveBlock1Ptr->money);
+}
+
+static bool8 HasEnoughShopCurrency(u32 amount)
+{
+    if (IsHeartScaleMart())
+        return GetShopCurrency() >= amount;
+    return IsEnoughMoney(&gSaveBlock1Ptr->money, amount);
+}
+
+static void BuyMenuPrintShopCurrency(void)
+{
+    if (IsHeartScaleMart())
+    {
+        ConvertIntToDecimalStringN(gStringVar1, GetShopCurrency(), STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
+        StringExpandPlaceholders(gStringVar4, sText_HeartScaleBalance);
+        FillWindowPixelBuffer(WIN_MONEY, PIXEL_FILL(0));
+        DrawStdFrameWithCustomTileAndPalette(WIN_MONEY, FALSE, 1, 13);
+        AddTextPrinterParameterized(WIN_MONEY, FONT_NARROW, gStringVar4, 0, 1, TEXT_SKIP_DRAW, NULL);
+        CopyWindowToVram(WIN_MONEY, COPYWIN_GFX);
+    }
+    else
+    {
+        PrintMoneyAmountInMoneyBox(WIN_MONEY, GetMoney(&gSaveBlock1Ptr->money), 0);
+    }
+}
+
 static void Task_ShopMenu(u8 taskId);
 static void Task_HandleShopMenuQuit(u8 taskId);
 static void CB2_InitBuyMenu(void);
@@ -149,7 +204,7 @@ static void Task_BuyHowManyDialogueInit(u8 taskId);
 static void BuyMenuConfirmPurchase(u8 taskId);
 static void BuyMenuPrintItemQuantityAndPrice(u8 taskId);
 static void Task_BuyHowManyDialogueHandleInput(u8 taskId);
-static void BuyMenuSubtractMoney(u8 taskId);
+static void BuyMenuSubtractCurrency(u8 taskId);
 static void RecordItemPurchase(u8 taskId);
 static void Task_ReturnToItemListAfterItemPurchase(u8 taskId);
 static void Task_ReturnToItemListAfterDecorationPurchase(u8 taskId);
@@ -628,11 +683,11 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
     {
         if (sMartInfo.martType == MART_TYPE_NORMAL)
         {
-            ConvertIntToDecimalStringN(
-                gStringVar1,
-                GetItemPrice(itemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT),
-                STR_CONV_MODE_LEFT_ALIGN,
-                6);
+            ConvertIntToDecimalStringN(gStringVar1, GetShopItemUnitPrice(itemId), STR_CONV_MODE_LEFT_ALIGN, 6);
+            if (IsHeartScaleMart())
+                StringExpandPlaceholders(gStringVar4, sText_HeartScalePrice);
+            else
+                StringExpandPlaceholders(gStringVar4, gText_PokedollarVar1);
         }
         else
         {
@@ -641,12 +696,11 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
                 gDecorations[itemId].price,
                 STR_CONV_MODE_LEFT_ALIGN,
                 6);
+            StringExpandPlaceholders(gStringVar4, gText_PokedollarVar1);
         }
 
         if (GetItemImportance(itemId) && (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1)))
             StringCopy(gStringVar4, gText_SoldOut);
-        else
-            StringExpandPlaceholders(gStringVar4, gText_PokedollarVar1);
         x = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 120);
         AddTextPrinterParameterized4(windowId, FONT_NARROW, x, y, 0, 0, sShopBuyMenuTextColors[COLORID_ITEM_LIST], TEXT_SKIP_DRAW, gStringVar4);
     }
@@ -776,8 +830,16 @@ static void BuyMenuDrawGraphics(void)
 {
     BuyMenuDrawMapGraphics();
     BuyMenuCopyMenuBgToBg1TilemapBuffer();
-    AddMoneyLabelObject(19, 11);
-    PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 1, 13, GetMoney(&gSaveBlock1Ptr->money));
+    if (IsHeartScaleMart())
+    {
+        PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 1, 13, 0);
+        BuyMenuPrintShopCurrency();
+    }
+    else
+    {
+        AddMoneyLabelObject(19, 11);
+        PrintMoneyAmountInMoneyBoxWithBorder(WIN_MONEY, 1, 13, GetMoney(&gSaveBlock1Ptr->money));
+    }
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
     ScheduleBgCopyTilemapToVram(2);
@@ -1000,16 +1062,16 @@ static void Task_BuyMenu(u8 taskId)
             BuyMenuRemoveScrollIndicatorArrows();
             BuyMenuPrintCursor(tListTaskId, COLORID_GRAY_CURSOR);
 
-            if (sMartInfo.martType == MART_TYPE_NORMAL)
-                sShopData->totalCost = (GetItemPrice(itemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT));
-            else
-                sShopData->totalCost = gDecorations[itemId].price;
+            sShopData->totalCost = GetShopItemUnitPrice(itemId);
 
             if (GetItemImportance(itemId) && (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1)))
                 BuyMenuDisplayMessage(taskId, gText_ThatItemIsSoldOut, BuyMenuReturnToItemList);
-            else if (!IsEnoughMoney(&gSaveBlock1Ptr->money, sShopData->totalCost))
+            else if (!HasEnoughShopCurrency(sShopData->totalCost))
             {
-                BuyMenuDisplayMessage(taskId, gText_YouDontHaveMoney, BuyMenuReturnToItemList);
+                BuyMenuDisplayMessage(
+                    taskId,
+                    IsHeartScaleMart() ? sText_YouDontHaveEnoughHeartScales : gText_YouDontHaveMoney,
+                    BuyMenuReturnToItemList);
             }
             else
             {
@@ -1019,9 +1081,12 @@ static void Task_BuyMenu(u8 taskId)
                     if (GetItemImportance(itemId))
                     {
                         ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
-                        StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
+                        if (IsHeartScaleMart())
+                            StringExpandPlaceholders(gStringVar4, sText_YouWantedVar1ThatllBeVar2HeartScales);
+                        else
+                            StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
                         tItemCount = 1;
-                        sShopData->totalCost = (GetItemPrice(tItemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT)) * tItemCount;
+                        sShopData->totalCost = GetShopItemUnitPrice(tItemId) * tItemCount;
                         BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
                     }
                     else if (GetItemPocket(itemId) == POCKET_TM_HM)
@@ -1068,11 +1133,10 @@ static void Task_BuyHowManyDialogueInit(u8 taskId)
     BuyMenuPrintItemQuantityAndPrice(taskId);
     ScheduleBgCopyTilemapToVram(0);
 
-    // Avoid division by zero in-case something costs 0 pokedollars.
-    if (sShopData->totalCost == 0)
+    if (GetShopItemUnitPrice(tItemId) == 0)
         maxQuantity = MAX_BAG_ITEM_CAPACITY;
     else
-        maxQuantity = GetMoney(&gSaveBlock1Ptr->money) / sShopData->totalCost;
+        maxQuantity = GetShopCurrency() / GetShopItemUnitPrice(tItemId);
 
     if (maxQuantity > MAX_BAG_ITEM_CAPACITY)
         sShopData->maxQuantity = MAX_BAG_ITEM_CAPACITY;
@@ -1088,7 +1152,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
 
     if (AdjustQuantityAccordingToDPadInput(&tItemCount, sShopData->maxQuantity) == TRUE)
     {
-        sShopData->totalCost = (GetItemPrice(tItemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT)) * tItemCount;
+        sShopData->totalCost = GetShopItemUnitPrice(tItemId) * tItemCount;
         BuyMenuPrintItemQuantityAndPrice(taskId);
     }
     else
@@ -1104,7 +1168,11 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
             CopyItemName(tItemId, gStringVar1);
             ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
             ConvertIntToDecimalStringN(gStringVar3, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, MAX_MONEY_DIGITS);
-            BuyMenuDisplayMessage(taskId, gText_Var1AndYouWantedVar2, BuyMenuConfirmPurchase);
+            if (IsHeartScaleMart())
+                StringExpandPlaceholders(gStringVar4, sText_Var1AndYouWantedVar2HeartScales);
+            else
+                StringExpandPlaceholders(gStringVar4, gText_Var1AndYouWantedVar2);
+            BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
         }
         else if (JOY_NEW(B_BUTTON))
         {
@@ -1135,7 +1203,7 @@ static void BuyMenuTryMakePurchase(u8 taskId)
         {
             GetSetItemObtained(tItemId, FLAG_SET_ITEM_OBTAINED);
             RecordItemPurchase(taskId);
-            BuyMenuDisplayMessage(taskId, gText_HereYouGoThankYou, BuyMenuSubtractMoney);
+            BuyMenuDisplayMessage(taskId, gText_HereYouGoThankYou, BuyMenuSubtractCurrency);
         }
         else
         {
@@ -1147,9 +1215,9 @@ static void BuyMenuTryMakePurchase(u8 taskId)
         if (DecorationAdd(tItemId))
         {
             if (sMartInfo.martType == MART_TYPE_DECOR)
-                BuyMenuDisplayMessage(taskId, gText_ThankYouIllSendItHome, BuyMenuSubtractMoney);
+                BuyMenuDisplayMessage(taskId, gText_ThankYouIllSendItHome, BuyMenuSubtractCurrency);
             else // MART_TYPE_DECOR2
-                BuyMenuDisplayMessage(taskId, gText_ThanksIllSendItHome, BuyMenuSubtractMoney);
+                BuyMenuDisplayMessage(taskId, gText_ThanksIllSendItHome, BuyMenuSubtractCurrency);
         }
         else
         {
@@ -1158,12 +1226,15 @@ static void BuyMenuTryMakePurchase(u8 taskId)
     }
 }
 
-static void BuyMenuSubtractMoney(u8 taskId)
+static void BuyMenuSubtractCurrency(u8 taskId)
 {
     IncrementGameStat(GAME_STAT_SHOPPED);
-    RemoveMoney(&gSaveBlock1Ptr->money, sShopData->totalCost);
+    if (IsHeartScaleMart())
+        RemoveBagItem(ITEM_HEART_SCALE, sShopData->totalCost);
+    else
+        RemoveMoney(&gSaveBlock1Ptr->money, sShopData->totalCost);
     PlaySE(SE_SHOP);
-    PrintMoneyAmountInMoneyBox(WIN_MONEY, GetMoney(&gSaveBlock1Ptr->money), 0);
+    BuyMenuPrintShopCurrency();
 
     if (sMartInfo.martType == MART_TYPE_NORMAL)
         gTasks[taskId].func = Task_ReturnToItemListAfterItemPurchase;
@@ -1233,10 +1304,28 @@ static void BuyMenuPrintItemQuantityAndPrice(u8 taskId)
     s16 *data = gTasks[taskId].data;
 
     FillWindowPixelBuffer(WIN_QUANTITY_PRICE, PIXEL_FILL(1));
-    PrintMoneyAmount(WIN_QUANTITY_PRICE, CalculateMoneyTextHorizontalPosition(sShopData->totalCost), 1, sShopData->totalCost, TEXT_SKIP_DRAW);
     ConvertIntToDecimalStringN(gStringVar1, tItemCount, STR_CONV_MODE_LEADING_ZEROS, MAX_ITEM_DIGITS);
     StringExpandPlaceholders(gStringVar4, gText_xVar1);
     BuyMenuPrint(WIN_QUANTITY_PRICE, gStringVar4, 0, 1, 0, COLORID_NORMAL);
+    if (IsHeartScaleMart())
+    {
+        ConvertIntToDecimalStringN(gStringVar1, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, MAX_MONEY_DIGITS);
+        StringExpandPlaceholders(gStringVar4, sText_HeartScaleQuantityPrice);
+        AddTextPrinterParameterized4(
+            WIN_QUANTITY_PRICE,
+            FONT_NARROW,
+            GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 80),
+            1,
+            0,
+            0,
+            sShopBuyMenuTextColors[COLORID_NORMAL],
+            TEXT_SKIP_DRAW,
+            gStringVar4);
+    }
+    else
+    {
+        PrintMoneyAmount(WIN_QUANTITY_PRICE, CalculateMoneyTextHorizontalPosition(sShopData->totalCost), 1, sShopData->totalCost, TEXT_SKIP_DRAW);
+    }
 }
 
 static void ExitBuyMenu(u8 taskId)
@@ -1250,7 +1339,8 @@ static void Task_ExitBuyMenu(u8 taskId)
 {
     if (!gPaletteFade.active)
     {
-        RemoveMoneyLabelObject();
+        if (!IsHeartScaleMart())
+            RemoveMoneyLabelObject();
         BuyMenuFreeMemory();
         SetMainCallback2(CB2_ReturnToField);
         DestroyTask(taskId);

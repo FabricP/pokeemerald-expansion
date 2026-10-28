@@ -16907,7 +16907,7 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
 === TRAINER_GOBLIN_STORE_GUSTAVS ===
 Name: GUSTAVS
-Class: Expert
+Class: Collector
 Pic: Hiker
 Gender: Male
 Music: Male
@@ -16920,7 +16920,7 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
 === TRAINER_GOBLIN_STORE_MOTT ===
 Name: MOTT
-Class: Expert
+Class: Cooltrainer
 Pic: Collector
 Gender: Male
 Music: Male
@@ -16957,7 +16957,7 @@ Magcargo
 Level: 10
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-=== TRAINER_GOBLIN_STORE_RUBIN===
+=== TRAINER_GOBLIN_STORE_RUBIN ===
 Name: RUBIN
 Class: Youngster
 Pic: Rich Boy
@@ -16969,3 +16969,17 @@ AI: Check Bad Move
 Glalie
 Level: 10
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_GOBLIN_STORE_ALEXANDRE ===
+Name: ALEXANDRE
+Class: Ninja Boy
+Pic: Dragon Tamer
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Slaking
+Level: 100
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- MOVE_SLACK_OFF

@@ -13,7 +13,7 @@ Uma batalha de treinador usa quatro partes:
 2. `src/data/trainers.party` define o nome, a classe e a equipe do treinador.
    Durante a compilação, o processador gera os dados C do treinador a partir
    deste arquivo.
-3. O arquivo `scripts.inc` do mapa define o diálogo e chama
+3. O arquivo `data/maps/.../scripts.inc` do mapa define o diálogo e chama
    `trainerbattle_single`.
 4. O `map.json` do mapa associa o script ao objeto do NPC.
 

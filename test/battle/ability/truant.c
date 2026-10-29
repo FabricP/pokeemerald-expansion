@@ -5,18 +5,20 @@
 SINGLE_BATTLE_TEST("Truant: Prevents attack on loafing turn")
 {
     GIVEN {
-        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); Moves(MOVE_TACKLE); }
-        OPPONENT(SPECIES_ABRA) { Speed(1); }
+        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); Speed(2); Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_ABRA) { HP(1000); MaxHP(1000); Speed(1); }
     }
     WHEN {
-        TURN { MOVE(PLAYER, MOVE_TACKLE); MOVE(OPPONENT, MOVE_TELEPORT); }
-        TURN { MOVE(PLAYER, MOVE_TACKLE); MOVE(OPPONENT, MOVE_TELEPORT); }
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); }
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); }
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); }
     }
     SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER); // First turn - attack succeeds
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player); // First turn - attack succeeds
         MESSAGE("Slaking is loafing around!"); // Second turn - loafing
-        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER); // No attack animation
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER); // Third turn - attack succeeds again
+        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player); // No attack animation
+        MESSAGE("Slaking used Tackle!"); // Third turn starts after the loafing turn
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player); // Third turn - attack succeeds again
     }
 }
 
@@ -24,17 +26,17 @@ SINGLE_BATTLE_TEST("Truant: Prevents attack on loafing turn")
 SINGLE_BATTLE_TEST("Truant: Slack Off can be used during loafing turn")
 {
     GIVEN {
-        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); HP(50); MaxHP(100); Moves(MOVE_SLACK_OFF, MOVE_TACKLE); }
-        OPPONENT(SPECIES_ABRA) { Speed(1); }
+        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); Speed(2); HP(50); MaxHP(100); Moves(MOVE_SLACK_OFF, MOVE_TACKLE); }
+        OPPONENT(SPECIES_ABRA) { HP(1000); MaxHP(1000); Speed(1); }
     }
     WHEN {
-        TURN { MOVE(PLAYER, MOVE_TACKLE); MOVE(OPPONENT, MOVE_TELEPORT); }
-        TURN { MOVE(PLAYER, MOVE_SLACK_OFF); MOVE(OPPONENT, MOVE_TELEPORT); }
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); }
+        TURN { MOVE(player, MOVE_SLACK_OFF); MOVE(opponent, MOVE_TACKLE); }
     }
     SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER); // First turn - attack succeeds
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, PLAYER); // Second turn - Slack Off succeeds despite loafing
-        MESSAGE("Slaking used Slack Off!"); // Confirmation message
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player); // First turn - attack succeeds
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, player); // Second turn - Slack Off succeeds despite loafing
+        HP_BAR(player, hp: 100);
     }
 }
 
@@ -42,23 +44,23 @@ SINGLE_BATTLE_TEST("Truant: Slack Off can be used during loafing turn")
 SINGLE_BATTLE_TEST("Truant: Slack Off doesn't affect alternating turn pattern")
 {
     GIVEN {
-        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); HP(50); MaxHP(100); Moves(MOVE_SLACK_OFF, MOVE_TACKLE); }
-        OPPONENT(SPECIES_ABRA) { Speed(1); }
+        PLAYER(SPECIES_SLAKING) { Ability(ABILITY_TRUANT); Speed(2); HP(50); MaxHP(100); Moves(MOVE_SLACK_OFF, MOVE_TACKLE); }
+        OPPONENT(SPECIES_ABRA) { HP(1000); MaxHP(1000); Speed(1); }
     }
     WHEN {
-        TURN { MOVE(PLAYER, MOVE_TACKLE); MOVE(OPPONENT, MOVE_TELEPORT); } // Turn 1: attack
-        TURN { MOVE(PLAYER, MOVE_SLACK_OFF); MOVE(OPPONENT, MOVE_TELEPORT); } // Turn 2: loaf (but use Slack Off)
-        TURN { MOVE(PLAYER, MOVE_TACKLE); MOVE(OPPONENT, MOVE_TELEPORT); } // Turn 3: attack
-        TURN { MOVE(PLAYER, MOVE_SLACK_OFF); MOVE(OPPONENT, MOVE_TELEPORT); } // Turn 4: loaf
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); } // Turn 1: attack
+        TURN { MOVE(player, MOVE_SLACK_OFF); MOVE(opponent, MOVE_TACKLE); } // Turn 2: loaf (but use Slack Off)
+        TURN { MOVE(player, MOVE_TACKLE); MOVE(opponent, MOVE_CELEBRATE); } // Turn 3: attack
+        TURN { MOVE(player, MOVE_SLACK_OFF); MOVE(opponent, MOVE_CELEBRATE); } // Turn 4: loaf
     }
     SCENE {
         // Turn 1: Normal attack
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player);
         // Turn 2: Slack Off instead of loafing completely
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, PLAYER);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, player);
         // Turn 3: Normal attack
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, PLAYER);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, player);
         // Turn 4: Loafing, but can use Slack Off again
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, PLAYER);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SLACK_OFF, player);
     }
 }

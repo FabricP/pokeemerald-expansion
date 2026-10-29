@@ -30,19 +30,20 @@ jobs:
       - name: ROM
         env:
           COMPARE: 0
-        run: make -j${nproc} -O all
+        run: make -j"$(nproc)" -O all
 
       - name: Release
         run: |
           make tidy
-          make -j${nproc} release
+          make -j"$(nproc)" release
         # make tidy to purge previous build
 
       - name: Test
         env:
           TEST: 1
         run: |
-          make -j${nproc} check
+          chmod +x tools/mgba/mgba-rom-test
+          make -j"$(nproc)" check
 
   docs_validate:
     if: github.actor != 'allcontributors[bot]'
@@ -53,7 +54,7 @@ jobs:
 
       - name: Check that SUMMARY.md includes markdown doc files
         run: |
-          .github/docs_validate/inclusive_summary.py
+          python3 .github/docs_validate/inclusive_summary.py
 
   allcontributors:
     if: github.actor == 'allcontributors[bot]'
@@ -62,4 +63,3 @@ jobs:
     steps:
       - name: Automatically pass for allcontributors
         run: echo "CI automatically passes for allcontributors" && exit 0
-

@@ -4414,8 +4414,8 @@
     {
       "id": "LAYOUT_MAMA_ISLAND",
       "name": "MamaIsland_Layout",
-      "width": 55,
-      "height": 40,
+      "width": 65,
+      "height": 46,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Dewford",
       "border_filepath": "data/layouts/MamaIsland/border.bin",

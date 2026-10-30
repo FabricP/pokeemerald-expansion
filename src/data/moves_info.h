@@ -10653,9 +10653,9 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
     {
         .name = COMPOUND_STRING("X-Scissor"),
         .description = COMPOUND_STRING(
-            "Slashes the foe with crossed\n"
-            "scythes, claws, etc."),
-        .effect = EFFECT_HIT,
+            "Slashes with crossed blades\n"
+            "and destroy the terrain."),
+        .effect = EFFECT_ICE_SPINNER,
         .power = 80,
         .type = TYPE_BUG,
         .accuracy = 100,

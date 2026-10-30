@@ -27,6 +27,13 @@
       "elevation": 0,
       "dest_map": "MAP_MAMA_ISLAND_GOBLIN_STORE_1F",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 53,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_MAMA_ISLAND_GOBLIN_STORE_2F",
+      "dest_warp_id": "0"
     }
   ],
   "coord_events": [],

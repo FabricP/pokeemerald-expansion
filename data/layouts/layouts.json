@@ -4440,6 +4440,16 @@
       "secondary_tileset": "gTileset_BrendansMaysHouse",
       "border_filepath": "data/layouts/MamaIsland_GoblinStore_2F/border.bin",
       "blockdata_filepath": "data/layouts/MamaIsland_GoblinStore_2F/map.bin"
+    },
+    {
+      "id": "LAYOUT_MAMA_CAVE_1F",
+      "name": "MamaCave_1F_Layout",
+      "width": 20,
+      "height": 40,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/MamaCave_1F/border.bin",
+      "blockdata_filepath": "data/layouts/MamaCave_1F/map.bin"
     }
   ]
 }

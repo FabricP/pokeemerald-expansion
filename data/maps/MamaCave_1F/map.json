@@ -1,0 +1,28 @@
+{
+  "id": "MAP_MAMA_CAVE_1F",
+  "name": "MamaCave_1F",
+  "layout": "LAYOUT_MAMA_CAVE_1F",
+  "music": "MUS_CONTEST_LOBBY",
+  "region_map_section": "MAPSEC_MAMA_CAVE",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_UNDERGROUND",
+  "allow_cycling": false,
+  "allow_escaping": true,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": null,
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 9,
+      "y": 1,
+      "elevation": 0,
+      "dest_map": "MAP_MAMA_ISLAND",
+      "dest_warp_id": "1"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": []
+}

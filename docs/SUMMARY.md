@@ -27,6 +27,7 @@
     - [How to add new AI Flags](tutorials/ai_logic.md)
   - [How to add new battle script commands/macros](tutorials/how_to_battle_script_command_macro.md)
   - [How to add a new move](tutorials/how_to_new_move.md)
+  - [Como criar habilidades personalizadas (Português)](tutorials/criar_habilidades_pt.md)
   - [Como criar uma loja com moeda personalizada (Português)](tutorials/loja_com_moeda_personalizada_pt.md)
   - [How to add a new trainer class]()
     - [How to add a new trainer front pic](tutorials/how_to_trainer_front_pic.md)

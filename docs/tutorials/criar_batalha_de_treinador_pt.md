@@ -147,6 +147,74 @@ caso, consulte os padrões de revanche e as macros `trainerbattle_rematch` no
 projeto; uma revanche envolve configurações adicionais além de apenas chamar
 `trainerbattle_single` novamente.
 
+## 3.1. Entregar um item depois de vencer a batalha
+
+Para executar ações imediatamente após a vitória, use o quarto argumento de
+`trainerbattle_single`: o script de callback da vitória. Nele, mostre a fala
+pós-batalha, entregue o item com `giveitem` e marque uma flag persistente para
+que o item não seja entregue novamente.
+
+Exemplo de Potion entregue uma única vez:
+
+```asm
+MamaIsland_GoblinStore_1F_EventScript_BugCatcher::
+    goto_if_set FLAG_RECEIVED_POTION_FROM_BUG_CATCHER, MamaIsland_GoblinStore_1F_EventScript_BugCatcherAlreadyRewarded
+    checktrainerflag TRAINER_GOBLIN_STORE_BUG_CATCHER
+    goto_if TRUE, MamaIsland_GoblinStore_1F_EventScript_BugCatcherGivePotion
+    trainerbattle_single TRAINER_GOBLIN_STORE_BUG_CATCHER, MamaIsland_GoblinStore_1F_Text_BugCatcherIntro, MamaIsland_GoblinStore_1F_Text_BugCatcherDefeat, MamaIsland_GoblinStore_1F_EventScript_BugCatcherPostBattle
+    end
+
+MamaIsland_GoblinStore_1F_EventScript_BugCatcherPostBattle::
+    msgbox MamaIsland_GoblinStore_1F_Text_BugCatcherPostBattle, MSGBOX_DEFAULT
+    goto MamaIsland_GoblinStore_1F_EventScript_BugCatcherGivePotion
+
+MamaIsland_GoblinStore_1F_EventScript_BugCatcherGivePotion::
+    giveitem ITEM_POTION
+    goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+    setflag FLAG_RECEIVED_POTION_FROM_BUG_CATCHER
+    release
+    end
+
+MamaIsland_GoblinStore_1F_EventScript_BugCatcherAlreadyRewarded::
+    msgbox MamaIsland_GoblinStore_1F_Text_BugCatcherAlreadyRewarded, MSGBOX_AUTOCLOSE
+    end
+```
+
+O fluxo é:
+
+1. Se a flag de recompensa já estiver ativa, mostrar apenas a fala de item já
+   recebido.
+2. Se o treinador já tiver sido derrotado, mas a recompensa ainda não tiver
+   sido entregue, ir diretamente para o script que tenta entregar o item. Isso
+   permite tentar novamente caso a mochila estivesse cheia.
+3. Caso contrário, iniciar a batalha e passar o callback como quarto argumento.
+   O callback é executado após a vitória, mostra a fala e segue para a entrega.
+4. `giveitem` define `VAR_RESULT` como `FALSE` se não puder adicionar o item.
+   Nesse caso, `Common_EventScript_ShowBagIsFull` avisa o jogador. A flag fica
+   desativada para que a entrega possa ser tentada depois.
+5. Só depois de `giveitem` ter sucesso, `setflag` registra que a recompensa foi
+   recebida.
+
+Declare a flag persistente em `include/constants/flags.h`, usando uma posição
+disponível e única. Não use uma flag temporária (`FLAG_TEMP_*`), pois ela é
+limpa quando o mapa é carregado. A flag do exemplo é ilustrativa: confirme que
+o nome e o valor escolhidos não estão sendo usados por outro evento.
+
+### Termine corretamente cada texto
+
+O marcador `$` encerra uma string de diálogo. Use-o no final do texto de
+vitória, assim como nos outros textos:
+
+```asm
+MamaIsland_GoblinStore_1F_Text_BugCatcherPostBattle:
+    .string "You won! Take this Potion.$"
+```
+
+Sem o `$`, o sistema pode continuar lendo os dados seguintes como parte do
+texto atual. Isso pode fazer a próxima fala aparecer automaticamente ou
+sobrescrever a fala pós-batalha. `\p` inicia uma nova página na mesma conversa;
+`\n` quebra a linha, mas nenhum dos dois substitui o `$` final.
+
 ## 4. Associar o script ao objeto no mapa
 
 Abra o `map.json` correspondente. Em `object_events`, cada objeto é identificado
@@ -200,8 +268,12 @@ Confirme que a compilação termina sem erros. Depois teste no jogo:
 1. Interaja com o objeto correto e confira a fala inicial.
 2. Verifique se a batalha usa a equipe, os níveis e os golpes configurados.
 3. Vença a batalha e confira o texto de vitória do treinador.
-4. Fale com ele novamente e confira que a batalha não se repete e que a fala
-   pós-batalha aparece.
+4. Se houver recompensa, confira que o item é entregue uma vez e que a fala
+   pós-batalha termina corretamente, sem iniciar o diálogo seguinte por cima.
+5. Se possível, repita com a mochila cheia: confira o aviso e tente receber o
+   item após liberar espaço.
+6. Fale com o treinador novamente e confirme que a batalha não se repete e que
+   a recompensa não é entregue outra vez.
 
 ## Exemplo existente
 

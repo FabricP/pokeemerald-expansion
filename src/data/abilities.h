@@ -2419,4 +2419,11 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .description = COMPOUND_STRING("Lowers the foe's Sp. Atk."),
         .aiRating = 7,
     },
+
+    [ABILITY_FABLE] =
+    {
+        .name = _("Fable"),
+        .description = COMPOUND_STRING("Clear weather/terrain/stats"),
+        .aiRating = 8,
+    },
 };

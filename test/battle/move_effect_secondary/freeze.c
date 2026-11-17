@@ -41,13 +41,17 @@ SINGLE_BATTLE_TEST("Powder Snow cannot freeze an Ice-type Pokémon")
         ANIMATION(ANIM_TYPE_MOVE, MOVE_POWDER_SNOW, player);
         HP_BAR(opponent);
         NONE_OF {
-            ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_FRZ, opponent);
+            ANIMATION(ANIM_TYPE_STATUS, (B_USE_FROSTBITE ? B_ANIM_STATUS_FRB : B_ANIM_STATUS_FRZ), opponent);
             FREEZE_OR_FROSTBURN_STATUS(opponent, TRUE);
         }
     }
 }
 
+#if B_USE_FROSTBITE == TRUE
+SINGLE_BATTLE_TEST("Frostbite cannot be inflicted in Sunlight")
+#else
 SINGLE_BATTLE_TEST("Freeze cannot be inflicted in Sunlight")
+#endif
 {
     GIVEN {
         PLAYER(SPECIES_WOBBUFFET);
@@ -55,7 +59,7 @@ SINGLE_BATTLE_TEST("Freeze cannot be inflicted in Sunlight")
     } WHEN {
         TURN { MOVE(opponent, MOVE_SUNNY_DAY); MOVE(player, MOVE_ICE_BEAM); }
     } SCENE {
-        NOT MESSAGE("Wobbuffet was frozen solid!");
+        FREEZE_OR_FROSTBURN_STATUS(opponent, FALSE);
     }
 }
 

@@ -1508,6 +1508,13 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .aiRating = 6,
     },
 
+    [ABILITY_PYROTECHNIST] =
+    {
+        .name = _("Pyrotechnist"),
+        .description = COMPOUND_STRING("Powers up Fire moves."),
+        .aiRating = 6,
+    },
+
     [ABILITY_BERSERK] =
     {
         .name = _("Berserk"),

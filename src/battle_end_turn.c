@@ -656,9 +656,9 @@ static bool32 HandleEndTurnSaltCure(u32 battler)
     {
         s32 saltCureDamage = 0;
         if (IS_BATTLER_ANY_TYPE(battler, TYPE_STEEL, TYPE_WATER))
-            saltCureDamage = GetNonDynamaxMaxHP(battler) / 4;
-        else
             saltCureDamage = GetNonDynamaxMaxHP(battler) / 8;
+        else
+            saltCureDamage = GetNonDynamaxMaxHP(battler) / 16;
         SetPassiveDamageAmount(battler, saltCureDamage);
         PREPARE_MOVE_BUFFER(gBattleTextBuff1, MOVE_SALT_CURE);
         BattleScriptExecute(BattleScript_SaltCureExtraDamage);

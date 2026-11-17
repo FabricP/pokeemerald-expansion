@@ -1,3 +1,21 @@
+HOST_ARM_GCC := $(shell command -v arm-none-eabi-gcc 2>/dev/null)
+DISTROBOX := $(shell command -v distrobox 2>/dev/null)
+POKEMON_DEVBOX ?= pokeemerald-dev
+RUN_MAKE_IN_DISTROBOX := 0
+
+ifeq ($(strip $(HOST_ARM_GCC)),)
+ifneq ($(strip $(DISTROBOX)),)
+RUN_MAKE_IN_DISTROBOX := 1
+endif
+endif
+
+ifeq ($(RUN_MAKE_IN_DISTROBOX),1)
+.DEFAULT_GOAL := __distrobox_make
+.PHONY: __distrobox_make
+__distrobox_make:
+	+@$(DISTROBOX) enter "$(POKEMON_DEVBOX)" -- $(MAKE) $(MAKECMDGOALS)
+else
+
 GAME_VERSION ?= EMERALD
 TITLE        ?= POKEMON EMER
 GAME_CODE    ?= BPEE
@@ -575,3 +593,5 @@ leafgreen: all
 # Symbol file (`make syms`)
 $(SYM): $(ELF)
 	$(OBJDUMP) -t $< | sort -u | grep -E "^0[2389]" | $(PERL) -p -e 's/^(\w{8}) (\w).{6} \S+\t(\w{8}) (\S+)$$/\1 \2 \3 \4/g' > $@
+
+endif

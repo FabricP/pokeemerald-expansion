@@ -46,7 +46,7 @@
   - [How to Namebox](tutorials/how_to_namebox.md)
   - [Vs. Seeker](tutorials/vs_seeker.md)
   - [Truant Slackof](tutorials/TRUANT_SLACK_OFF_MODIFICATION.md)
-  - [Wild Item](WILD_ITEM_DROP.md)
+  - [Wild Item](tutorials/WILD_ITEM_DROP.md)
   - [Nuzlocke](tutorials/NUZLOCKE_SYSTEM.md)
 - [Changelog](./CHANGELOG.md)
     - [1.14.x]()

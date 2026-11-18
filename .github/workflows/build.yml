@@ -1,10 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - master
-      - upcoming
   workflow_dispatch:
 
 jobs:

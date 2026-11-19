@@ -1171,3 +1171,7 @@ EventScript_VsSeekerChargingDone::
 	.include "data/maps/MamaIsland_GoblinStore_2F/scripts.inc"
 
 	.include "data/maps/MamaCave_1F/scripts.inc"
+
+	.include "data/maps/MamaDeepCave_1F/scripts.inc"
+
+	.include "data/maps/MamaHole_1F/scripts.inc"

@@ -95,7 +95,9 @@
     "Underwater_Route105",
     "Underwater_Route125",
     "MamaIsland",
-    "MamaCave_1F"
+    "MamaCave_1F",
+    "MamaDeepCave_1F",
+    "MamaHole_1F"
   ],
   "gMapGroup_IndoorLittleroot": [
     "LittlerootTown_BrendansHouse_1F",

@@ -21,6 +21,13 @@
       "elevation": 0,
       "dest_map": "MAP_MAMA_CAVE_1F",
       "dest_warp_id": "1"
+    },
+    {
+      "x": 45,
+      "y": 3,
+      "elevation": 0,
+      "dest_map": "MAP_MAMA_HOLE_1F",
+      "dest_warp_id": "0"
     }
   ],
   "coord_events": [],

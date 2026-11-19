@@ -18,7 +18,7 @@ MamaIsland_GoblinStore_1F_Text_PedrinhoOpening:
 	.string "My name is PEDRINHO, how can i help?$"
 
 MamaIsland_GoblinStore_1F_Text_PedrinhoClosing:
-	.string "Pedrinho fim$"
+	.string "Happy gaming!$"
 
 	.align 2
 
@@ -84,14 +84,13 @@ MamaIsland_GoblinStore_1F_EventScript_Fabas::
 	end
 
 MamaIsland_GoblinStore_1F_Text_FabasIntro:
-	.string "Where is my natural guarana?\p"
+	.string "Where is my Guarana with Ginseng?\p"
 	.string "Hey you!\n"
 	.string "Do you dare challenge me?\p"
 	.string "Don't scream!!$"
 
 MamaIsland_GoblinStore_1F_Text_FabasDefeat:
-	.string "You only beat me because I was nerfed\n"
-	.string "by the nature.$"
+	.string "Ops...$"
 
 MamaIsland_GoblinStore_1F_EventScript_FabasPostBattle::
 	msgbox MamaIsland_GoblinStore_1F_Text_FabasDefeated, MSGBOX_DEFAULT
@@ -110,8 +109,8 @@ MamaIsland_GoblinStore_1F_EventScript_FabasAlreadyRewarded::
 	end
 
 MamaIsland_GoblinStore_1F_Text_FabasAlreadyRewarded:
-	.string "I already gave you your Potion.\n"
-	.string "Take good care of it!$"
+	.string "You only beat me because I was nerfed\n"
+	.string "by the nature.$"
 
 
 @ ---------- BATALHA CONTRA MAMA ----------

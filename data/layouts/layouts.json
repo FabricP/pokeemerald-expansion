@@ -4460,6 +4460,16 @@
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/MamaDeepCave_1F/border.bin",
       "blockdata_filepath": "data/layouts/MamaDeepCave_1F/map.bin"
+    },
+    {
+      "id": "LAYOUT_MAMA_HOLE_1F",
+      "name": "MamaHole_1F_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/MamaHole_1F/border.bin",
+      "blockdata_filepath": "data/layouts/MamaHole_1F/map.bin"
     }
   ]
 }

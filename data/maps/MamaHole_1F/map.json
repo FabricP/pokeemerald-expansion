@@ -5,7 +5,7 @@
   "music": "MUS_CAVE_OF_ORIGIN",
   "region_map_section": "MAPSEC_MAMA_HOLE",
   "requires_flash": false,
-  "weather": "WEATHER_SANDSTORM",
+  "weather": "WEATHER_VOLCANIC_ASH",
   "map_type": "MAP_TYPE_UNDERGROUND",
   "allow_cycling": false,
   "allow_escaping": true,

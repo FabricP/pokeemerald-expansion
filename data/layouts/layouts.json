@@ -4444,12 +4444,22 @@
     {
       "id": "LAYOUT_MAMA_CAVE_1F",
       "name": "MamaCave_1F_Layout",
-      "width": 20,
-      "height": 40,
+      "width": 24,
+      "height": 41,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/MamaCave_1F/border.bin",
       "blockdata_filepath": "data/layouts/MamaCave_1F/map.bin"
+    },
+    {
+      "id": "LAYOUT_MAMA_DEEP_CAVE_1F",
+      "name": "MamaDeepCave_1F_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/MamaDeepCave_1F/border.bin",
+      "blockdata_filepath": "data/layouts/MamaDeepCave_1F/map.bin"
     }
   ]
 }

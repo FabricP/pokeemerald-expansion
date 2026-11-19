@@ -1242,6 +1242,10 @@
     {
       "id": "MAPSEC_MAMA_CAVE",
       "name": "MAMA CAVE"
+    },
+    {
+      "id": "MAPSEC_MAMA_DEEP_CAVE",
+      "name": "MAMA DEEP CAVE"
     }
   ]
 }

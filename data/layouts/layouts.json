@@ -4464,8 +4464,8 @@
     {
       "id": "LAYOUT_MAMA_HOLE_1F",
       "name": "MamaHole_1F_Layout",
-      "width": 20,
-      "height": 20,
+      "width": 50,
+      "height": 30,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/MamaHole_1F/border.bin",

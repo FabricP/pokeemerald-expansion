@@ -16,8 +16,8 @@
   "object_events": [],
   "warp_events": [
     {
-      "x": 11,
-      "y": 3,
+      "x": 10,
+      "y": 25,
       "elevation": 0,
       "dest_map": "MAP_MAMA_DEEP_CAVE_1F",
       "dest_warp_id": "1"

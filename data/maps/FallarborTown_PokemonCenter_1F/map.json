@@ -69,7 +69,7 @@
       "flag": "FLAG_HIDE_FALLARBOR_POKEMON_CENTER_LANETTE"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_LINK_RECEPTIONIST",
+      "graphics_id": "OBJ_EVENT_GFX_UNION_ROOM_NURSE",
       "x": 12,
       "y": 2,
       "elevation": 3,

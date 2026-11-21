@@ -26,7 +26,7 @@ o script geral e usa uma flag de ocultação:
   "trainer_type": "TRAINER_TYPE_NONE",
   "trainer_sight_or_berry_tree_id": "0",
   "script": "Common_EventScript_MoveRelearner",
-  "flag": "FLAG_SHOW_MOVE_RELEARNER"
+  "flag": "FLAG_SHOW_MR_SM"
 }
 ```
 
@@ -37,7 +37,7 @@ quando está ligada, o objeto não aparece. Por isso, não se deve colocar
 diretamente `FLAG_BADGE04_GET` nesse campo; essa flag começa desligada e é
 ligada ao obter a insígnia, o que inverteria o comportamento desejado.
 
-O fluxo usa a flag própria `FLAG_SHOW_MOVE_RELEARNER`. Apesar do nome, ela é
+O fluxo usa a flag própria `FLAG_SHOW_MR_SM`. Apesar do nome, ela é
 referenciada pelo campo de ocultação dos objetos:
 
 1. A flag é definida (ligada) no início de um novo jogo em
@@ -47,7 +47,7 @@ referenciada pelo campo de ocultação dos objetos:
    a limpa quando `VAR_PETALBURG_GYM_STATE` chega a `6`, que representa quatro
    insígnias. O mesmo evento já expande o estoque do Poké Mart de Petalburg.
 3. Como o campo `flag` oculta o objeto quando está ligado, o tutor fica
-   escondido enquanto `FLAG_SHOW_MOVE_RELEARNER` está ligada. Ao limpar a flag
+   escondido enquanto `FLAG_SHOW_MR_SM` está ligada. Ao limpar a flag
    após quatro insígnias, o NPC aparece ao entrar nos Centros Pokémon.
 
 A flag é declarada em [`flags.h`](../../include/constants/flags.h) usando uma
@@ -60,7 +60,7 @@ acabaria escondendo o move relearner no pós-jogo.
 1. Abra o `map.json` do mapa e acrescente um objeto em `object_events`.
 2. Escolha uma posição livre e defina `script` como
    `Common_EventScript_MoveRelearner`.
-3. Use `FLAG_SHOW_MOVE_RELEARNER` no campo `flag` para manter o
+3. Use `FLAG_SHOW_MR_SM` no campo `flag` para manter o
    NPC sincronizado com o desbloqueio existente.
 4. Recompile o projeto para regenerar os dados de eventos do mapa.
 

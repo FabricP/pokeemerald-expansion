@@ -719,7 +719,7 @@ Common_ShowEasyChatScreen::
 Common_EventScript_ReadyPetalburgGymForBattle::
 	clearflag FLAG_HIDE_PETALBURG_GYM_GREETER
 	setflag FLAG_PETALBURG_MART_EXPANDED_ITEMS
-	clearflag FLAG_SHOW_MOVE_RELEARNER
+	clearflag FLAG_SHOW_MR_SM
 	return
 
 Common_EventScript_BufferTrendyPhrase::

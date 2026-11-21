@@ -35,6 +35,7 @@ PetalburgCity_Mart_EventScript_ExpandedItems::
 
 	.align 2
 PetalburgCity_Mart_Pokemart_Expanded:
+	.2byte ITEM_MASTER_BALL
 	.2byte ITEM_POKE_BALL
 	.2byte ITEM_GREAT_BALL
 	.2byte ITEM_POTION

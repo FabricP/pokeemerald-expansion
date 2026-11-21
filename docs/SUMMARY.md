@@ -29,6 +29,7 @@
   - [How to add a new move](tutorials/how_to_new_move.md)
   - [Como criar habilidades personalizadas (Português)](tutorials/criar_habilidades_pt.md)
   - [Como criar uma loja com moeda personalizada (Português)](tutorials/loja_com_moeda_personalizada_pt.md)
+  - [Move relearner nos Centros Pokémon (Português)](tutorials/move_relearner_em_centros_pt.md)
   - [How to add a new trainer class]()
     - [How to add a new trainer front pic](tutorials/how_to_trainer_front_pic.md)
     - [How to add a new trainer back pic](tutorials/how_to_trainer_back_pic.md)

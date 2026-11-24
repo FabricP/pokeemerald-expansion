@@ -1175,3 +1175,5 @@ EventScript_VsSeekerChargingDone::
 	.include "data/maps/MamaDeepCave_1F/scripts.inc"
 
 	.include "data/maps/MamaHole_1F/scripts.inc"
+
+	.include "data/maps/FabasForest/scripts.inc"

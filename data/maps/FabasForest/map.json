@@ -1,0 +1,26 @@
+{
+  "id": "MAP_FABAS_FOREST",
+  "name": "FabasForest",
+  "layout": "LAYOUT_FABAS_FOREST",
+  "music": "MUS_DUMMY",
+  "region_map_section": "MAPSEC_FABAS_FOREST",
+  "requires_flash": false,
+  "weather": "WEATHER_SHADE",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_VERDANTURF_TOWN",
+      "offset": -3,
+      "direction": "up"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": []
+}

@@ -1250,6 +1250,10 @@
     {
       "id": "MAPSEC_MAMA_HOLE",
       "name": "MAMA HOLE"
+    },
+    {
+      "id": "MAPSEC_FABAS_FOREST",
+      "name": "FABAS FOREST"
     }
   ]
 }

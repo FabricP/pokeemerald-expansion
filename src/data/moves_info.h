@@ -4250,7 +4250,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .effect = EFFECT_HIT,
         .power = 75,
         .type = TYPE_ROCK,
-        .accuracy = 90,
+        .accuracy = 95,
         .pp = 10,
         .target = MOVE_TARGET_BOTH,
         .priority = 0,
@@ -4258,7 +4258,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         #if B_UPDATED_MOVE_DATA >= GEN_2
             .additionalEffects = ADDITIONAL_EFFECTS({
                 .moveEffect = MOVE_EFFECT_FLINCH,
-                .chance = 30,
+                .chance = 20,
             }),
         #endif
         .contestEffect = C_UPDATED_MOVE_EFFECTS >= GEN_6 ? CONTEST_EFFECT_STARTLE_PREV_MONS : CONTEST_EFFECT_BADLY_STARTLE_PREV_MONS,

@@ -3397,9 +3397,9 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
             "Clubs the foe with a bone.\n"
             "May cause flinching."),
         .effect = EFFECT_HIT,
-        .power = 65,
+        .power = 80,
         .type = TYPE_GROUND,
-        .accuracy = 85,
+        .accuracy = 95,
         .pp = 20,
         .target = MOVE_TARGET_SELECTED,
         .priority = 0,

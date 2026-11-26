@@ -15924,7 +15924,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
             "Beams of glowing blue light\n"
             "blast both foes."),
         .effect = EFFECT_HIT,
-        .power = 110,
+        .power = 80,
         .type = TYPE_WATER,
         .accuracy = 85,
         .pp = 10,

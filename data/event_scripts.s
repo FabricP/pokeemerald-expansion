@@ -696,6 +696,7 @@ EventScript_SetBrineyLocation_Route109::
 	return
 
 	.include "data/scripts/pkmn_center_nurse.inc"
+	.include "data/scripts/common_stone_mart.inc"
 	.include "data/scripts/obtain_item.inc"
 	.include "data/scripts/record_mix.inc"
 	.include "data/scripts/pc.inc"
@@ -719,6 +720,7 @@ Common_ShowEasyChatScreen::
 Common_EventScript_ReadyPetalburgGymForBattle::
 	clearflag FLAG_HIDE_PETALBURG_GYM_GREETER
 	setflag FLAG_PETALBURG_MART_EXPANDED_ITEMS
+	clearflag FLAG_SHOW_MR_SM
 	return
 
 Common_EventScript_BufferTrendyPhrase::

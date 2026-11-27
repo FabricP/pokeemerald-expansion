@@ -103,6 +103,15 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
         {104, 106, 106, 116, 136, 115, 102, 113},
         {104, 130, 106, 140, 136, 139, 102, 137},
     },
+    [PARTY_LAYOUT_LINK_PREVIEW] =
+    {
+        {16, 16, 255, 255, 255, 255, 255, 255},
+        {16, 32, 255, 255, 255, 255, 255, 255},
+        {16, 48, 255, 255, 255, 255, 255, 255},
+        {16, 64, 255, 255, 255, 255, 255, 255},
+        {16, 80, 255, 255, 255, 255, 255, 255},
+        {16, 96, 255, 255, 255, 255, 255, 255},
+    },
 };
 
 // Used only when both Cancel and Confirm are present
@@ -382,6 +391,90 @@ static const struct WindowTemplate sShowcaseMultiPartyMenuWindowTemplate[] =
         .baseBlock = 0x1A1,
     },
     DUMMY_WIN_TEMPLATE
+};
+
+static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
+{
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 1,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 3,
+        .baseBlock = 0x63,
+    },
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 3,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 4,
+        .baseBlock = 0x7F,
+    },
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 5,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x9B,
+    },
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 7,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 6,
+        .baseBlock = 0xB7,
+    },
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 9,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 7,
+        .baseBlock = 0xD3,
+    },
+    {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 11,
+        .width = 14,
+        .height = 2,
+        .paletteNum = 8,
+        .baseBlock = 0xEF,
+    },
+    [WIN_MSG] = {
+        .bg = 2,
+        .tilemapLeft = 1,
+        .tilemapTop = 15,
+        .width = 28,
+        .height = 4,
+        .paletteNum = 14,
+        .baseBlock = 0x1DF,
+    },
+    DUMMY_WIN_TEMPLATE
+};
+
+static const struct WindowTemplate sLinkBattleOpponentWindowTemplates[PARTY_SIZE] =
+{
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 1,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x250 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 3,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x26C },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 5,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x288 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 7,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2A4 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 9,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2C0 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 11, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2DC },
+};
+
+static const struct WindowTemplate sLinkBattleTeamHeaderWindowTemplates[] =
+{
+    { .bg = 0, .tilemapLeft = 1,  .tilemapTop = 0, .width = 14, .height = 1, .paletteNum = 14, .baseBlock = 0x2F8 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 0, .width = 14, .height = 1, .paletteNum = 14, .baseBlock = 0x306 },
 };
 
 static const struct WindowTemplate sCancelButtonWindowTemplate =

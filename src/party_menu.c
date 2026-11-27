@@ -230,7 +230,15 @@ EWRAM_DATA u8 gSelectedMonPartyId = 0;
 EWRAM_DATA MainCallback gPostMenuFieldCallback = NULL;
 static EWRAM_DATA u16 *sSlot1TilemapBuffer = 0; // for switching party slots
 static EWRAM_DATA u16 *sSlot2TilemapBuffer = 0; //
-EWRAM_DATA u8 gSelectedOrderFromParty[MAX_FRONTIER_PARTY_SIZE] = {0};
+EWRAM_DATA u8 gSelectedOrderFromParty[PARTY_SIZE] = {0};
+EWRAM_DATA u16 gLinkBattleOpponentPartySpecies[PARTY_SIZE] = {0};
+EWRAM_DATA u8 gLinkBattleTeamSelectionCount = 0;
+EWRAM_DATA bool8 gLinkBattleTeamSelectionActive = FALSE;
+static MainCallback sLinkBattlePartySelectionCallback;
+static MainCallback sLinkBattlePartySelectionResultCallback;
+static u8 sLinkBattlePartySelectionCount;
+static u8 sLinkBattleOpponentWindowIds[PARTY_SIZE];
+static u8 sLinkBattleHeaderWindowIds[2];
 static EWRAM_DATA u16 sPartyMenuItemId = 0;
 EWRAM_DATA u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2] = {0}; // bits 0-3 are the current pos of Slot 1, 4-7 are Slot 2, and so on
 static EWRAM_DATA u8 sInitialLevel = 0;
@@ -443,6 +451,10 @@ static bool8 ReturnGiveItemToBagOrPC(u16);
 static void Task_DisplayGaveMailFromBagMessage(u8);
 static void Task_HandleSwitchItemsFromBagYesNoInput(u8);
 static void Task_ValidateChosenHalfParty(u8);
+static void CB2_ExchangeLinkBattleParty(void);
+static void CB2_LinkBattlePartySelectorExit(void);
+static void RenderLinkBattlePartyMenuBox(u8);
+static void DrawLinkBattleOpponentPreview(void);
 static bool8 GetBattleEntryEligibility(struct Pokemon *);
 static bool8 HasPartySlotAlreadyBeenSelected(u8);
 static u8 GetBattleEntryLevelCap(void);
@@ -972,7 +984,11 @@ static void LoadPartyMenuBoxes(u8 layout)
 
 static void RenderPartyMenuBox(u8 slot)
 {
-    if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
+    if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+    {
+        RenderLinkBattlePartyMenuBox(slot);
+    }
+    else if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
     {
         DisplayPartyPokemonDataForMultiBattle(slot);
         if (gMultiPartnerParty[slot - MULTI_PARTY_SIZE].species == SPECIES_NONE)
@@ -1016,6 +1032,39 @@ static void RenderPartyMenuBox(u8 slot)
         PutWindowTilemap(sPartyMenuBoxes[slot].windowId);
         ScheduleBgCopyTilemapToVram(0);
     }
+}
+
+static void RenderLinkBattlePartyMenuBox(u8 slot)
+{
+    u8 i;
+    u8 order = 0;
+    u8 windowId = sPartyMenuBoxes[slot].windowId;
+    struct Pokemon *mon = &gPlayerParty[slot];
+
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+    LoadPartyBoxPalette(&sPartyMenuBoxes[slot], (slot == gPartyMenu.slotId) ? PARTY_PAL_SELECTED : 0);
+
+    if (GetMonData(mon, MON_DATA_SPECIES) != SPECIES_NONE)
+    {
+        for (i = 0; i < gLinkBattleTeamSelectionCount; i++)
+        {
+            if (gSelectedOrderFromParty[i] == slot + 1)
+            {
+                order = i + 1;
+                break;
+            }
+        }
+        if (order != 0)
+        {
+            ConvertIntToDecimalStringN(gStringVar2, order, STR_CONV_MODE_LEFT_ALIGN, 1);
+            AddTextPrinterParameterized3(windowId, FONT_SMALL, 22, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar2);
+        }
+        GetMonNickname(mon, gStringVar1);
+        AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar1, FONT_SMALL, 0, 72), 32, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar1);
+    }
+
+    PutWindowTilemap(windowId);
+    CopyWindowToVram(windowId, COPYWIN_FULL);
 }
 
 static void DisplayPartyPokemonData(u8 slot)
@@ -1225,6 +1274,13 @@ static void CreatePartyMonSprites(u8 slot)
 {
     u8 actualSlot;
 
+    if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+    {
+        if (GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES) != SPECIES_NONE)
+            CreatePartyMonIconSprite(&gPlayerParty[slot], &sPartyMenuBoxes[slot], slot);
+        return;
+    }
+
     if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
     {
         u8 status;
@@ -1294,7 +1350,8 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         {
             LoadPartyBoxPalette(&sPartyMenuBoxes[slot], GetPartyBoxPaletteFlags(slot, animNum));
             AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum);
-            PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
+            if (gPartyMenu.layout != PARTY_LAYOUT_LINK_PREVIEW)
+                PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
         return;
     case PARTY_SIZE: // Confirm
@@ -1736,7 +1793,7 @@ static void UpdateCurrentPartySelection(s8 *slotPtr, s8 movementDir)
     s8 newSlotId = *slotPtr;
     u8 layout = gPartyMenu.layout;
 
-    if (layout == PARTY_LAYOUT_SINGLE)
+    if (layout == PARTY_LAYOUT_SINGLE || layout == PARTY_LAYOUT_LINK_PREVIEW)
         UpdatePartySelectionSingleLayout(slotPtr, movementDir);
     else
         UpdatePartySelectionDoubleLayout(slotPtr, movementDir);
@@ -2280,6 +2337,8 @@ static u8 CanTeachMove(struct Pokemon *mon, u16 move)
 
 static void InitPartyMenuWindows(u8 layout)
 {
+    u8 i;
+
     switch (layout)
     {
     case PARTY_LAYOUT_SINGLE:
@@ -2291,11 +2350,66 @@ static void InitPartyMenuWindows(u8 layout)
     case PARTY_LAYOUT_MULTI:
         InitWindows(sMultiPartyMenuWindowTemplate);
         break;
+    case PARTY_LAYOUT_LINK_PREVIEW:
+        InitWindows(sLinkBattlePartyMenuWindowTemplate);
+        for (i = 0; i < PARTY_SIZE; i++)
+            sLinkBattleOpponentWindowIds[i] = AddWindow(&sLinkBattleOpponentWindowTemplates[i]);
+        sLinkBattleHeaderWindowIds[0] = AddWindow(&sLinkBattleTeamHeaderWindowTemplates[0]);
+        sLinkBattleHeaderWindowIds[1] = AddWindow(&sLinkBattleTeamHeaderWindowTemplates[1]);
+        break;
     default: // PARTY_LAYOUT_MULTI_SHOWCASE
         InitWindows(sShowcaseMultiPartyMenuWindowTemplate);
         break;
     }
     LoadPartyMenuWindows();
+    if (layout == PARTY_LAYOUT_LINK_PREVIEW)
+        DrawLinkBattleOpponentPreview();
+}
+
+static void DrawLinkBattleOpponentPreview(void)
+{
+    u8 i;
+    u16 species;
+    u16 type;
+    u16 type2;
+    u8 *typesString;
+
+    for (i = 0; i < 2; i++)
+    {
+        u8 windowId = sLinkBattleHeaderWindowIds[i];
+        const u8 *text = (i == 0) ? gText_YourTeam : gText_Opponent;
+
+        FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+        AddTextPrinterParameterized3(windowId, FONT_SMALL, 2, 0, sFontColorTable[0], TEXT_SKIP_DRAW, text);
+        PutWindowTilemap(windowId);
+        CopyWindowToVram(windowId, COPYWIN_FULL);
+    }
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u8 windowId = sLinkBattleOpponentWindowIds[i];
+
+        FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+        species = gLinkBattleOpponentPartySpecies[i];
+        if (species != SPECIES_NONE)
+        {
+            StringCopy(gStringVar1, GetSpeciesName(species));
+            type = GetSpeciesType(species, 0);
+            type2 = GetSpeciesType(species, 1);
+            StringCopy(gStringVar2, gTypesInfo[type].name);
+            if (type2 != type)
+            {
+                typesString = gStringVar2 + StringLength(gStringVar2);
+                *typesString++ = CHAR_SLASH;
+                *typesString = EOS;
+                StringAppend(gStringVar2, gTypesInfo[type2].name);
+            }
+            AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar1, FONT_SMALL, 0, 92), 2, 0, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar1);
+            AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar2, FONT_SMALL, 0, 92), 2, 8, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar2);
+        }
+        PutWindowTilemap(windowId);
+        CopyWindowToVram(windowId, COPYWIN_FULL);
+    }
 }
 
 static void LoadPartyMenuWindows(void)
@@ -3876,7 +3990,10 @@ static void CursorCb_Enter(u8 taskId)
         {
             PlaySE(SE_SELECT);
             gSelectedOrderFromParty[i] = gPartyMenu.slotId + 1;
-            DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+            if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+                RenderLinkBattlePartyMenuBox(gPartyMenu.slotId);
+            else
+                DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
             if (i == (maxBattlers - 1))
                 MoveCursorToConfirm();
             DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
@@ -3917,11 +4034,19 @@ static void CursorCb_NoEntry(u8 taskId)
             break;
         }
     }
-    DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_ABLE_3, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
-    for (i = 0; i < (maxBattlers - 1); i++)
+    if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
     {
-        if (gSelectedOrderFromParty[i] != 0)
-            DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gSelectedOrderFromParty[i] - 1], 1);
+        for (i = 0; i < PARTY_SIZE; i++)
+            RenderLinkBattlePartyMenuBox(i);
+    }
+    else
+    {
+        DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_ABLE_3, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+        for (i = 0; i < (maxBattlers - 1); i++)
+        {
+            if (gSelectedOrderFromParty[i] != 0)
+                DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gSelectedOrderFromParty[i] - 1], 1);
+        }
     }
     DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
     gTasks[taskId].func = Task_HandleChooseMonInput;
@@ -7264,6 +7389,95 @@ void InitChooseHalfPartyForBattle(u8 unused)
     gPartyMenu.task = Task_ValidateChosenHalfParty;
 }
 
+bool8 IsLinkBattleTeamPreviewSupported(void)
+{
+    u8 partnerId;
+
+    if (GetLinkPlayerCount() != 2)
+        return FALSE;
+
+    partnerId = GetMultiplayerId() ^ 1;
+    return (gLinkPlayers[partnerId].neverRead & LINK_PLAYER_FLAG_TEAM_PREVIEW) != 0;
+}
+
+u8 GetLinkBattleEligiblePartyCount(void)
+{
+    u8 i;
+    u8 count = 0;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+            && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+            count++;
+    }
+
+    return count;
+}
+
+void StartLinkBattleTeamSelection(u8 count, MainCallback callback)
+{
+    sLinkBattlePartySelectionCount = count;
+    sLinkBattlePartySelectionResultCallback = callback;
+    gLinkBattleTeamSelectionActive = FALSE;
+    gMain.state = 0;
+    SetMainCallback2(CB2_ExchangeLinkBattleParty);
+}
+
+static void CB2_ExchangeLinkBattleParty(void)
+{
+    u8 i;
+    u8 remoteId;
+    u8 receivedPlayers = BitmaskAllOtherLinkPlayers();
+    u16 species[PARTY_SIZE];
+
+    switch (gMain.state)
+    {
+    case 0:
+        for (i = 0; i < PARTY_SIZE; i++)
+        {
+            if (i < gPlayerPartyCount)
+                species[i] = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+            else
+                species[i] = SPECIES_NONE;
+        }
+        if (SendBlock(0, species, sizeof(species)))
+            gMain.state++;
+        break;
+    case 1:
+        if ((GetBlockReceivedStatus() & receivedPlayers) == receivedPlayers)
+        {
+            remoteId = GetMultiplayerId() ^ 1;
+            memcpy(gLinkBattleOpponentPartySpecies, gBlockRecvBuffer[remoteId], sizeof(gLinkBattleOpponentPartySpecies));
+            ResetBlockReceivedFlags();
+            InitLinkBattlePartySelector(sLinkBattlePartySelectionCount, sLinkBattlePartySelectionResultCallback);
+        }
+        break;
+    }
+
+    RunTasks();
+    RunTextPrinters();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+}
+
+void InitLinkBattlePartySelector(u8 count, MainCallback callback)
+{
+    ClearSelectedPartyOrder();
+    gLinkBattleTeamSelectionCount = count;
+    gLinkBattleTeamSelectionActive = TRUE;
+    sLinkBattlePartySelectionCallback = callback;
+    InitPartyMenu(PARTY_MENU_TYPE_CHOOSE_HALF, PARTY_LAYOUT_LINK_PREVIEW, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_LinkBattlePartySelectorExit);
+    gPartyMenu.task = Task_ValidateChosenHalfParty;
+}
+
+static void CB2_LinkBattlePartySelectorExit(void)
+{
+    gLinkBattleTeamSelectionActive = FALSE;
+    SetMainCallback2(sLinkBattlePartySelectionCallback);
+}
+
 void ClearSelectedPartyOrder(void)
 {
     memset(gSelectedOrderFromParty, 0, sizeof(gSelectedOrderFromParty));
@@ -7291,6 +7505,9 @@ static bool8 GetBattleEntryEligibility(struct Pokemon *mon)
         return FALSE;
     }
 
+    if (gLinkBattleTeamSelectionActive)
+        return GetMonData(mon, MON_DATA_SPECIES) != SPECIES_NONE;
+
     switch (VarGet(VAR_FRONTIER_FACILITY))
     {
     case FACILITY_MULTI_OR_EREADER:
@@ -7315,6 +7532,16 @@ static u8 CheckBattleEntriesAndGetMessage(void)
     struct Pokemon *party = gPlayerParty;
     u8 minBattlers = GetMinBattleEntries();
     u8 *order = gSelectedOrderFromParty;
+
+    if (gLinkBattleTeamSelectionActive)
+    {
+        if (minBattlers == 0 || order[minBattlers - 1] != 0)
+            return 0xFF;
+        if (minBattlers == 1)
+            return PARTY_MSG_NO_MON_FOR_BATTLE;
+        ConvertIntToDecimalStringN(gStringVar1, minBattlers, STR_CONV_MODE_LEFT_ALIGN, 1);
+        return PARTY_MSG_X_MONS_ARE_NEEDED;
+    }
 
     if (order[minBattlers - 1] == 0)
     {
@@ -7386,6 +7613,9 @@ static void Task_ContinueChoosingHalfParty(u8 taskId)
 
 static u8 GetMaxBattleEntries(void)
 {
+    if (gLinkBattleTeamSelectionActive)
+        return gLinkBattleTeamSelectionCount;
+
     switch (VarGet(VAR_FRONTIER_FACILITY))
     {
     case FACILITY_MULTI_OR_EREADER:
@@ -7399,6 +7629,9 @@ static u8 GetMaxBattleEntries(void)
 
 static u8 GetMinBattleEntries(void)
 {
+    if (gLinkBattleTeamSelectionActive)
+        return gLinkBattleTeamSelectionCount;
+
     switch (VarGet(VAR_FRONTIER_FACILITY))
     {
     case FACILITY_MULTI_OR_EREADER:
@@ -7412,6 +7645,9 @@ static u8 GetMinBattleEntries(void)
 
 static u8 GetBattleEntryLevelCap(void)
 {
+    if (gLinkBattleTeamSelectionActive)
+        return MAX_LEVEL;
+
     switch (VarGet(VAR_FRONTIER_FACILITY))
     {
     case FACILITY_MULTI_OR_EREADER:
@@ -7428,6 +7664,9 @@ static u8 GetBattleEntryLevelCap(void)
 static const u8 *GetFacilityCancelString(void)
 {
     u8 facilityNum = VarGet(VAR_FRONTIER_FACILITY);
+
+    if (gLinkBattleTeamSelectionActive)
+        return gText_CancelBattle;
 
     if (!(facilityNum != FACILITY_UNION_ROOM && facilityNum != FACILITY_MULTI_OR_EREADER))
         return gText_CancelBattle;

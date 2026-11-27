@@ -70,6 +70,9 @@ static void Task_ReestablishLink(u8 taskId);
 static void Task_ReestablishLinkAwaitConnection(u8 taskId);
 static void Task_ReestablishLinkLeader(u8 taskId);
 static void Task_ReestablishLinkAwaitConfirmation(u8 taskId);
+static void CB2_CableClubTeamSelectionResult(void);
+static void CB2_RunCableClubBattleTask(void);
+static void BeginCableClubTeamSelection(u8 taskId, u8 resumeState);
 
 #define tState      data[0]
 
@@ -813,22 +816,118 @@ static void SetLinkBattleTypeFlags(int linkService)
     switch (linkService)
     {
     case USING_SINGLE_BATTLE:
+        if (gLinkBattleTeamSelectionCount != 0)
+        {
+            ReducePlayerPartyToSelectedMons();
+            gLinkBattleTeamSelectionCount = 0;
+        }
         gBattleTypeFlags = BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER;
         break;
     case USING_DOUBLE_BATTLE:
+        if (gLinkBattleTeamSelectionCount != 0)
+        {
+            ReducePlayerPartyToSelectedMons();
+            gLinkBattleTeamSelectionCount = 0;
+        }
         gBattleTypeFlags = BATTLE_TYPE_DOUBLE | BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER;
         break;
     case USING_MULTI_BATTLE:
+        gLinkBattleTeamSelectionCount = 0;
         ReducePlayerPartyToSelectedMons();
         gBattleTypeFlags = BATTLE_TYPE_DOUBLE | BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER | BATTLE_TYPE_MULTI;
         break;
     case USING_BATTLE_TOWER:
+        gLinkBattleTeamSelectionCount = 0;
         gBattleTypeFlags = BATTLE_TYPE_BATTLE_TOWER | BATTLE_TYPE_DOUBLE | BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER | BATTLE_TYPE_MULTI;
         break;
     }
 }
 
 #define tTimer data[1]
+
+static u8 sCableClubTeamSelectionTaskId;
+static u8 sCableClubTeamSelectionResumeState;
+
+static u8 GetLinkBattleTeamSelectionCount(void)
+{
+    u8 count = GetLinkBattleEligiblePartyCount();
+
+    if (gSpecialVar_0x8004 == USING_DOUBLE_BATTLE && count > MAX_FRONTIER_PARTY_SIZE)
+        count = MAX_FRONTIER_PARTY_SIZE;
+    return count;
+}
+
+static void BeginCableClubTeamSelection(u8 taskId, u8 resumeState)
+{
+    gLinkBattleTeamSelectionCount = 0;
+    if (!IsLinkBattleTeamPreviewSupported())
+    {
+        gTasks[taskId].tState = resumeState;
+        return;
+    }
+
+    gLinkBattleTeamSelectionCount = GetLinkBattleTeamSelectionCount();
+    sCableClubTeamSelectionTaskId = taskId;
+    sCableClubTeamSelectionResumeState = resumeState;
+    gTasks[taskId].tState = 8;
+    StartLinkBattleTeamSelection(gLinkBattleTeamSelectionCount, CB2_CableClubTeamSelectionResult);
+}
+
+static void CB2_CableClubTeamSelectionResult(void)
+{
+    u8 remoteId;
+    u8 receivedPlayers = BitmaskAllOtherLinkPlayers();
+
+    switch (gMain.state)
+    {
+    case 0:
+        memset(gBlockSendBuffer, 0, 0x20);
+        gBlockSendBuffer[0] = (gSelectedOrderFromParty[0] != 0);
+        if (SendBlock(0, gBlockSendBuffer, 0x20))
+            gMain.state++;
+        break;
+    case 1:
+        if ((GetBlockReceivedStatus() & receivedPlayers) == receivedPlayers)
+        {
+            remoteId = GetMultiplayerId() ^ 1;
+            ResetBlockReceivedFlags();
+            if (gBlockRecvBuffer[remoteId][0] != 0 && gSelectedOrderFromParty[0] != 0)
+            {
+                gTasks[sCableClubTeamSelectionTaskId].tState = sCableClubTeamSelectionResumeState;
+                SetMainCallback2(CB2_RunCableClubBattleTask);
+            }
+            else
+            {
+                SetCloseLinkCallback();
+                gMain.state++;
+            }
+        }
+        break;
+    case 2:
+        if (!gReceivedRemoteLinkPlayers)
+        {
+            LoadPlayerParty();
+            gLinkBattleTeamSelectionCount = 0;
+            SetMainCallback2(CB2_ReturnToFieldFromMultiplayer);
+        }
+        break;
+    }
+
+    RunTasks();
+    RunTextPrinters();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+}
+
+static void CB2_RunCableClubBattleTask(void)
+{
+    RunTasks();
+    RunTextPrinters();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+}
 
 static void Task_StartWiredCableClubBattle(u8 taskId)
 {
@@ -849,7 +948,7 @@ static void Task_StartWiredCableClubBattle(u8 taskId)
     case 2:
         task->tTimer++;
         if (task->tTimer > 20)
-            task->tState++;
+            BeginCableClubTeamSelection(taskId, 3);
         break;
     case 3:
         SetCloseLinkCallback();
@@ -871,6 +970,8 @@ static void Task_StartWiredCableClubBattle(u8 taskId)
         SetMainCallback2(CB2_InitBattle);
         gMain.savedCallback = CB2_ReturnFromCableClubBattle;
         DestroyTask(taskId);
+        break;
+    case 8:
         break;
     }
 }
@@ -912,7 +1013,7 @@ static void Task_StartWirelessCableClubBattle(u8 taskId)
     case 4:
         tTimer++;
         if (tTimer > 20)
-            tState = 5;
+            BeginCableClubTeamSelection(taskId, 5);
         break;
     case 5:
         SetLinkStandbyCallback();
@@ -937,6 +1038,8 @@ static void Task_StartWirelessCableClubBattle(u8 taskId)
         SetMainCallback2(CB2_InitBattle);
         gMain.savedCallback = CB2_ReturnFromCableClubBattle;
         DestroyTask(taskId);
+        break;
+    case 8:
         break;
     }
 }

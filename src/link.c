@@ -320,6 +320,8 @@ static void InitLocalLinkPlayer(void)
     gLocalLinkPlayer.version = gGameVersion + 0x4000;
     gLocalLinkPlayer.lp_field_2 = 0x8000;
     gLocalLinkPlayer.progressFlags = IsNationalPokedexEnabled();
+    // Advertise support using the reserved LinkPlayer byte.
+    gLocalLinkPlayer.neverRead = LINK_PLAYER_FLAG_TEAM_PREVIEW;
     if (FlagGet(FLAG_IS_CHAMPION))
     {
         gLocalLinkPlayer.progressFlags |= 0x10;

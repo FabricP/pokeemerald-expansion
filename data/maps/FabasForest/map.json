@@ -2,7 +2,7 @@
   "id": "MAP_FABAS_FOREST",
   "name": "FabasForest",
   "layout": "LAYOUT_FABAS_FOREST",
-  "music": "MUS_DUMMY",
+  "music": "MUS_CONTEST",
   "region_map_section": "MAPSEC_FABAS_FOREST",
   "requires_flash": false,
   "weather": "WEATHER_SHADE",
@@ -16,15 +16,15 @@
   "object_events": [],
   "warp_events": [
     {
-      "x": 9,
-      "y": 1,
+      "x": 6,
+      "y": 7,
       "elevation": 0,
       "dest_map": "MAP_VERDANTURF_TOWN",
       "dest_warp_id": "7"
     },
     {
-      "x": 10,
-      "y": 1,
+      "x": 7,
+      "y": 7,
       "elevation": 0,
       "dest_map": "MAP_VERDANTURF_TOWN",
       "dest_warp_id": "8"

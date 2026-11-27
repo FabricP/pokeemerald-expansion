@@ -12,15 +12,24 @@
   "allow_running": true,
   "show_map_name": true,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": [
+  "connections": null,
+  "object_events": [],
+  "warp_events": [
     {
-      "map": "MAP_VERDANTURF_TOWN",
-      "offset": -3,
-      "direction": "up"
+      "x": 9,
+      "y": 1,
+      "elevation": 0,
+      "dest_map": "MAP_VERDANTURF_TOWN",
+      "dest_warp_id": "7"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "elevation": 0,
+      "dest_map": "MAP_VERDANTURF_TOWN",
+      "dest_warp_id": "8"
     }
   ],
-  "object_events": [],
-  "warp_events": [],
   "coord_events": [],
   "bg_events": []
 }

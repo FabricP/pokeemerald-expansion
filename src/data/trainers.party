@@ -16927,9 +16927,10 @@ Music: Male
 Double Battle: No
 AI: Check Bad Move
 
-Klinklang (M)
+Regieleki (M)
 Level: 10
-IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 31 SpD / 0 Spe
+- Agility
 
 === TRAINER_GOBLIN_STORE_DUDU ===
 Name: DUDU
@@ -16969,9 +16970,10 @@ Music: Male
 Double Battle: Yes
 AI: Check Bad Move
 
-Glalie
+Regieleki (M)
 Level: 10
-IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 31 SpD / 0 Spe
+- Agility
 
 === TRAINER_GOBLIN_STORE_ALEXANDRE ===
 Name: ALEXANDRE
@@ -16985,7 +16987,4 @@ AI: Check Bad Move
 Vigoroth @ ITEM_LEFTOVERS
 Level: 10
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Grassy Terrain
-- Electric Terrain
-- Psychic Terrain
-- Misty Terrain
+- Trick Room

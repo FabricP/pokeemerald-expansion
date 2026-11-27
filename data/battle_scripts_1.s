@@ -8178,6 +8178,12 @@ BattleScript_ActivateFable::
 	normalisebuffs
 	printstring STRINGID_STATCHANGESGONE
 	waitmessage B_WAIT_TIME_LONG
+	jumpifhalfword CMP_NO_COMMON_BITS, gFieldStatuses, STATUS_FIELD_TRICK_ROOM, BattleScript_ActivateFable_CheckWeather
+	bicword gFieldStatuses, STATUS_FIELD_TRICK_ROOM
+	sethword gFieldTimers + 8, 0
+	printstring STRINGID_TRICKROOMENDS
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_ActivateFable_CheckWeather:
 	jumpifhalfword CMP_COMMON_BITS, gBattleWeather, B_WEATHER_ANY, BattleScript_ActivateFable_RemoveWeather
 	jumpifhalfword CMP_COMMON_BITS, gFieldStatuses, STATUS_FIELD_TERRAIN_ANY, BattleScript_ActivateFable_RemoveTerrain
 	goto BattleScript_ActivateFable_End

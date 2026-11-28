@@ -27,6 +27,9 @@ struct PokemonStorage
 };
 
 extern struct PokemonStorage *gPokemonStoragePtr;
+extern const u16 gPokemonStorageHandCursorPal[];
+extern const u16 gPokemonStorageHandCursorWhitePal[];
+extern const u8 gPokemonStorageHandCursorGfx[];
 
 void DrawTextWindowAndBufferTiles(const u8 *string, void *dst, u8 zero1, u8 zero2, s32 bytesToBuffer);
 u8 CountMonsInBox(u8 boxId);

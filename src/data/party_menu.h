@@ -105,12 +105,12 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
     },
     [PARTY_LAYOUT_LINK_PREVIEW] =
     {
-        {16, 16, 255, 255, 255, 255, 255, 255},
-        {16, 32, 255, 255, 255, 255, 255, 255},
-        {16, 48, 255, 255, 255, 255, 255, 255},
-        {16, 64, 255, 255, 255, 255, 255, 255},
-        {16, 80, 255, 255, 255, 255, 255, 255},
-        {16, 96, 255, 255, 255, 255, 255, 255},
+        {16, 24, 255, 255, 255, 255, 255, 255},
+        {16, 40, 255, 255, 255, 255, 255, 255},
+        {16, 56, 255, 255, 255, 255, 255, 255},
+        {16, 72, 255, 255, 255, 255, 255, 255},
+        {16, 88, 255, 255, 255, 255, 255, 255},
+        {16, 104, 255, 255, 255, 255, 255, 255},
     },
 };
 
@@ -398,7 +398,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 1,
+        .tilemapTop = 2,
         .width = 14,
         .height = 2,
         .paletteNum = 3,
@@ -407,7 +407,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 3,
+        .tilemapTop = 4,
         .width = 14,
         .height = 2,
         .paletteNum = 4,
@@ -416,7 +416,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 5,
+        .tilemapTop = 6,
         .width = 14,
         .height = 2,
         .paletteNum = 5,
@@ -425,7 +425,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 7,
+        .tilemapTop = 8,
         .width = 14,
         .height = 2,
         .paletteNum = 6,
@@ -434,7 +434,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 9,
+        .tilemapTop = 10,
         .width = 14,
         .height = 2,
         .paletteNum = 7,
@@ -443,7 +443,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
     {
         .bg = 0,
         .tilemapLeft = 1,
-        .tilemapTop = 11,
+        .tilemapTop = 12,
         .width = 14,
         .height = 2,
         .paletteNum = 8,
@@ -453,7 +453,7 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
         .bg = 2,
         .tilemapLeft = 1,
         .tilemapTop = 15,
-        .width = 14,
+        .width = 28,
         .height = 4,
         .paletteNum = 14,
         .baseBlock = 0x1DF,
@@ -463,18 +463,18 @@ static const struct WindowTemplate sLinkBattlePartyMenuWindowTemplate[] =
 
 static const struct WindowTemplate sLinkBattleOpponentWindowTemplates[PARTY_SIZE] =
 {
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 1,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x250 },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 3,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x26C },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 5,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x288 },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 7,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2A4 },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 9,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2C0 },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 11, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x2DC },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 2,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x320 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 4,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x33C },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 6,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x358 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 8,  .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x374 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 10, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x390 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 12, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x3AC },
 };
 
 static const struct WindowTemplate sLinkBattleTeamHeaderWindowTemplates[] =
 {
-    { .bg = 0, .tilemapLeft = 1,  .tilemapTop = 0, .width = 14, .height = 1, .paletteNum = 14, .baseBlock = 0x2F8 },
-    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 0, .width = 14, .height = 1, .paletteNum = 14, .baseBlock = 0x306 },
+    { .bg = 0, .tilemapLeft = 1,  .tilemapTop = 0, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x3C8 },
+    { .bg = 0, .tilemapLeft = 16, .tilemapTop = 0, .width = 14, .height = 2, .paletteNum = 14, .baseBlock = 0x3E4 },
 };
 
 static const struct WindowTemplate sCancelButtonWindowTemplate =

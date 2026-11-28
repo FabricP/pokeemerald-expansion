@@ -937,7 +937,7 @@ static const u16 sScrollingBgMoveItems_Pal[] = INCBIN_U16("graphics/pokemon_stor
 static const u16 sCloseBoxButton_Tilemap[]   = INCBIN_U16("graphics/pokemon_storage/close_box_button.bin");
 static const u16 sPartySlotFilled_Tilemap[]  = INCBIN_U16("graphics/pokemon_storage/party_slot_filled.bin");
 static const u16 sPartySlotEmpty_Tilemap[]   = INCBIN_U16("graphics/pokemon_storage/party_slot_empty.bin");
-static const u16 sWaveform_Pal[]             = INCBIN_U16("graphics/pokemon_storage/waveform.gbapal");
+const u16 gPokemonStorageHandCursorWhitePal[] = INCBIN_U16("graphics/pokemon_storage/waveform.gbapal");
 static const u32 sWaveform_Gfx[]             = INCBIN_U32("graphics/pokemon_storage/waveform.4bpp");
 static const u16 sUnused_Pal[]               = INCBIN_U16("graphics/pokemon_storage/unused.gbapal");
 static const u16 sTextWindows_Pal[]          = INCBIN_U16("graphics/pokemon_storage/text_windows.gbapal");
@@ -1017,7 +1017,7 @@ static const struct BgTemplate sBgTemplates[] =
 
 static const struct SpritePalette sWaveformSpritePalette =
 {
-    sWaveform_Pal, PALTAG_MISC_2
+    gPokemonStorageHandCursorWhitePal, PALTAG_MISC_2
 };
 
 static const struct SpriteSheet sSpriteSheet_Waveform =
@@ -1292,8 +1292,8 @@ static const struct SpriteTemplate sSpriteTemplate_Arrow =
     .callback = SpriteCB_Arrow
 };
 
-static const u16 sHandCursor_Pal[] = INCBIN_U16("graphics/pokemon_storage/hand_cursor.gbapal");
-static const u8 sHandCursor_Gfx[] = INCBIN_U8("graphics/pokemon_storage/hand_cursor.4bpp");
+const u16 gPokemonStorageHandCursorPal[] = INCBIN_U16("graphics/pokemon_storage/hand_cursor.gbapal");
+const u8 gPokemonStorageHandCursorGfx[] = INCBIN_U8("graphics/pokemon_storage/hand_cursor.4bpp");
 static const u8 sHandCursorShadow_Gfx[] = INCBIN_U8("graphics/pokemon_storage/hand_cursor_shadow.4bpp");
 
 
@@ -1738,7 +1738,8 @@ void ResetPokemonStorageSystem(void)
 static void LoadChooseBoxMenuGfx(struct ChooseBoxMenu *menu, u16 tileTag, u16 palTag, u8 subpriority, bool32 loadPal)
 {
     // Because loadPal is always false, the below palette is never used.
-    // The Choose Box menu instead uses the palette indicated by palTag, which is always PALTAG_MISC_1 (sHandCursor_Pal)
+    // The Choose Box menu instead uses the palette indicated by palTag, which is always
+    // PALTAG_MISC_1 (gPokemonStorageHandCursorPal).
     struct SpritePalette palette =
     {
         sChooseBoxMenu_Pal, palTag
@@ -7803,14 +7804,14 @@ static void CreateCursorSprites(void)
     u8 priority, subpriority;
     struct SpriteSheet spriteSheets[] =
     {
-        {sHandCursor_Gfx, 0x800, GFXTAG_CURSOR},
+        {gPokemonStorageHandCursorGfx, 0x800, GFXTAG_CURSOR},
         {sHandCursorShadow_Gfx, 0x80, GFXTAG_CURSOR_SHADOW},
         {}
     };
 
     struct SpritePalette spritePalettes[] =
     {
-        {sHandCursor_Pal, PALTAG_MISC_1},
+        {gPokemonStorageHandCursorPal, PALTAG_MISC_1},
         {}
     };
 

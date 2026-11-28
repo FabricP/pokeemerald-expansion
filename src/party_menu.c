@@ -458,6 +458,8 @@ static void DrawLinkBattleOpponentPreview(void);
 static void CreateLinkBattlePreviewIcons(void);
 static void CreateLinkBattlePreviewTypeIcons(u16, u8, bool8);
 static void CreateLinkBattlePreviewTypeIcon(u8, s16, s16);
+static void CreateLinkBattlePreviewCursor(void);
+static void SpriteCB_LinkBattlePreviewCursor(struct Sprite *);
 static bool8 GetBattleEntryEligibility(struct Pokemon *);
 static bool8 HasPartySlotAlreadyBeenSelected(u8);
 static u8 GetBattleEntryLevelCap(void);
@@ -522,6 +524,55 @@ static void FieldCallback_RockClimb(void);
 
 // static const data
 #include "data/party_menu.h"
+
+enum
+{
+    TAG_LINK_BATTLE_PREVIEW_CURSOR = 0xA1B0,
+    PAL_TAG_LINK_BATTLE_PREVIEW_CURSOR = 0xA1B1,
+};
+
+static const struct SpriteSheet sLinkBattlePreviewCursorSheet =
+{
+    .data = gPokemonStorageHandCursorGfx,
+    .size = 0x800,
+    .tag = TAG_LINK_BATTLE_PREVIEW_CURSOR,
+};
+
+static const struct SpritePalette sLinkBattlePreviewCursorPalette =
+{
+    .data = gPokemonStorageHandCursorWhitePal,
+    .tag = PAL_TAG_LINK_BATTLE_PREVIEW_CURSOR,
+};
+
+static const struct OamData sLinkBattlePreviewCursorOamData =
+{
+    .shape = SPRITE_SHAPE(32x32),
+    .size = SPRITE_SIZE(32x32),
+    .priority = 0,
+};
+
+static const union AnimCmd sLinkBattlePreviewCursorAnim[] =
+{
+    ANIMCMD_FRAME(0, 30),
+    ANIMCMD_FRAME(16, 30),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd *const sLinkBattlePreviewCursorAnimTable[] =
+{
+    sLinkBattlePreviewCursorAnim,
+};
+
+static const struct SpriteTemplate sLinkBattlePreviewCursorTemplate =
+{
+    .tileTag = TAG_LINK_BATTLE_PREVIEW_CURSOR,
+    .paletteTag = PAL_TAG_LINK_BATTLE_PREVIEW_CURSOR,
+    .oam = &sLinkBattlePreviewCursorOamData,
+    .anims = sLinkBattlePreviewCursorAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_LinkBattlePreviewCursor,
+};
 
 // code
 static void InitPartyMenu(u8 menuType, u8 layout, u8 partyAction, bool8 keepCursorPos, u8 messageId, TaskFunc task, MainCallback callback)
@@ -2417,6 +2468,34 @@ static void CreateLinkBattlePreviewIcons(void)
         if (species != SPECIES_NONE)
             CreateLinkBattlePreviewTypeIcons(species, i, FALSE);
     }
+
+    CreateLinkBattlePreviewCursor();
+}
+
+static void CreateLinkBattlePreviewCursor(void)
+{
+    u8 spriteId;
+
+    LoadSpriteSheet(&sLinkBattlePreviewCursorSheet);
+    LoadSpritePalette(&sLinkBattlePreviewCursorPalette);
+    spriteId = CreateSprite(&sLinkBattlePreviewCursorTemplate, 16, sPartyMenuBoxes[0].spriteCoords[1], 0);
+    if (spriteId != MAX_SPRITES)
+        StartSpriteAnim(&gSprites[spriteId], 0);
+}
+
+static void SpriteCB_LinkBattlePreviewCursor(struct Sprite *sprite)
+{
+    u8 slot = gPartyMenu.slotId;
+
+    if (slot >= PARTY_SIZE || GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        sprite->invisible = TRUE;
+        return;
+    }
+
+    sprite->invisible = FALSE;
+    sprite->x = sPartyMenuBoxes[slot].spriteCoords[0];
+    sprite->y = sPartyMenuBoxes[slot].spriteCoords[1];
 }
 
 static void CreateLinkBattlePreviewTypeIcons(u16 species, u8 slot, bool8 isOpponent)

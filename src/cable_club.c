@@ -876,7 +876,7 @@ static void BeginCableClubTeamSelection(u8 taskId, u8 resumeState)
 static void CB2_CableClubTeamSelectionResult(void)
 {
     u8 remoteId;
-    u8 receivedPlayers = BitmaskAllOtherLinkPlayers();
+    u8 receivedPlayers = GetLinkPlayerCountAsBitFlags() ^ (1 << GetMultiplayerId());
 
     switch (gMain.state)
     {

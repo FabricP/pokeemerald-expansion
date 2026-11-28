@@ -7428,7 +7428,7 @@ static void CB2_ExchangeLinkBattleParty(void)
 {
     u8 i;
     u8 remoteId;
-    u8 receivedPlayers = BitmaskAllOtherLinkPlayers();
+    u8 receivedPlayers = GetLinkPlayerCountAsBitFlags() ^ (1 << GetMultiplayerId());
     u16 species[PARTY_SIZE];
 
     switch (gMain.state)

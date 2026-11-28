@@ -1733,7 +1733,7 @@ static void MoveSelectionDisplayMoveDescription(u32 battler)
         acc = 0;
     }
 
-    u8 pwr_num[3], acc_num[3];
+    u8 pwr_num[4], acc_num[4];
     u8 cat_desc[7] = _("CAT: ");
     u8 pwr_desc[7] = _("PWR: ");
     u8 acc_desc[7] = _("ACC: ");
@@ -1763,9 +1763,14 @@ static void MoveSelectionDisplayMoveDescription(u32 battler)
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MOVE_DESCRIPTION);
 
     if (gCategoryIconSpriteId == 0xFF)
-        gCategoryIconSpriteId = CreateSprite(&gSpriteTemplate_CategoryIcons, 38, 64, 1);
+    {
+        u8 spriteId = CreateSprite(&gSpriteTemplate_CategoryIcons, 38, 64, 1);
+        if (spriteId != MAX_SPRITES)
+            gCategoryIconSpriteId = spriteId;
+    }
 
-    StartSpriteAnim(&gSprites[gCategoryIconSpriteId], cat);
+    if (gCategoryIconSpriteId != 0xFF)
+        StartSpriteAnim(&gSprites[gCategoryIconSpriteId], cat);
 
     CopyWindowToVram(B_WIN_MOVE_DESCRIPTION, COPYWIN_FULL);
 }

@@ -54,8 +54,13 @@ static const u8 sTextColors[] = { TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY, TEXT_C
 static void CB2_SetUpPartiesAndStartBattle(void)
 {
     s32 i;
+    u8 partySize = gLinkBattleTeamSelectionCount;
+
+    if (partySize == 0)
+        partySize = UNION_ROOM_PARTY_SIZE;
+
     StartUnionRoomBattle(BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER);
-    for (i = 0; i < UNION_ROOM_PARTY_SIZE; i++)
+    for (i = 0; i < partySize; i++)
     {
         gEnemyParty[i] = gPlayerParty[gSelectedOrderFromParty[i] - 1];
     }
@@ -63,12 +68,13 @@ static void CB2_SetUpPartiesAndStartBattle(void)
     {
         ZeroMonData(&gPlayerParty[i]);
     }
-    for (i = 0; i < UNION_ROOM_PARTY_SIZE; i++)
+    for (i = 0; i < partySize; i++)
     {
         gPlayerParty[i] = gEnemyParty[i];
     }
     IncrementGameStat(GAME_STAT_NUM_UNION_ROOM_BATTLES);
     CalculatePlayerPartyCount();
+    gLinkBattleTeamSelectionCount = 0;
     TRAINER_BATTLE_PARAM.opponentA = TRAINER_UNION_ROOM;
     SetMainCallback2(CB2_InitBattle);
 }
@@ -174,6 +180,7 @@ void CB2_UnionRoomBattle(void)
             }
             else
             {
+                gLinkBattleTeamSelectionCount = 0;
                 SetCloseLinkCallback();
                 if (gBlockRecvBuffer[GetMultiplayerId()][0] == (ACTIVITY_DECLINE | IN_UNION_ROOM))
                 {

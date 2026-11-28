@@ -505,6 +505,7 @@ const u8 gText_PlayersPC[] = _("{PLAYER}'s PC");
 const u8 gText_HallOfFame[] = _("HALL OF FAME");
 const u8 gText_LogOff[] = _("LOG OFF");
 const u8 gText_Opponent[] = _("OPPONENT");
+const u8 gText_YourTeam[] = _("YOUR TEAM");
 const u8 gText_Tourney_Tree[] = _("TOURNEY TREE");
 const u8 gText_ReadyToStart[] = _("READY TO START");
 const u8 gText_Single2[] = _("SINGLE");

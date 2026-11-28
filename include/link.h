@@ -105,6 +105,8 @@
 #define LINKTYPE_CONTEST_GMODE         0x6601
 #define LINKTYPE_CONTEST_EMODE         0x6602
 
+#define LINK_PLAYER_FLAG_TEAM_PREVIEW  (1 << 0)
+
 enum {
     BLOCK_REQ_SIZE_NONE, // Identical to 200
     BLOCK_REQ_SIZE_200,

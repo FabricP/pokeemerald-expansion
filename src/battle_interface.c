@@ -3003,14 +3003,19 @@ void TryToAddMoveInfoWindow(void)
 
     if (gBattleStruct->moveInfoSpriteId == MAX_SPRITES)
     {
-        gBattleStruct->moveInfoSpriteId = CreateSprite(&sSpriteTemplate_MoveInfoWindow, LAST_BALL_WIN_X_0, LAST_USED_WIN_Y + 32, 6);
-        gSprites[gBattleStruct->moveInfoSpriteId].sHide = FALSE;
+        u8 spriteId = CreateSprite(&sSpriteTemplate_MoveInfoWindow, LAST_BALL_WIN_X_0, LAST_USED_WIN_Y + 32, 6);
+        if (spriteId == MAX_SPRITES)
+            return;
+
+        gBattleStruct->moveInfoSpriteId = spriteId;
+        gSprites[spriteId].sHide = FALSE;
     }
 }
 
 void TryToHideMoveInfoWindow(void)
 {
-    gSprites[gBattleStruct->moveInfoSpriteId].sHide = TRUE;
+    if (gBattleStruct->moveInfoSpriteId != MAX_SPRITES)
+        gSprites[gBattleStruct->moveInfoSpriteId].sHide = TRUE;
 }
 
 static void DestroyMoveInfoWinGfx(struct Sprite *sprite)

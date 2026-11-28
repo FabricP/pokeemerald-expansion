@@ -817,6 +817,7 @@ extern const u8 gText_YellowShard[];
 extern const u8 gText_BlueShard[];
 extern const u8 gText_GreenShard[];
 extern const u8 gText_Opponent[];
+extern const u8 gText_YourTeam[];
 extern const u8 gText_Tourney_Tree[];
 extern const u8 gText_ReadyToStart[];
 extern const u8 gText_Record2[];

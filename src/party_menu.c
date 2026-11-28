@@ -1405,7 +1405,28 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         if (GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES) != SPECIES_NONE)
         {
             LoadPartyBoxPalette(&sPartyMenuBoxes[slot], GetPartyBoxPaletteFlags(slot, animNum));
-            AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum);
+            if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+            {
+                struct Sprite *sprite = &gSprites[sPartyMenuBoxes[slot].monSpriteId];
+
+                if (animNum == 0)
+                {
+                    sprite->x2 = 0;
+                    sprite->y2 = 0;
+                    sprite->callback = SpriteCallbackDummy;
+                }
+                else
+                {
+                    sprite->animCmdIndex = 0;
+                    sprite->animDelayCounter = 0;
+                    UpdateMonIconFrame(sprite);
+                    AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum);
+                }
+            }
+            else
+            {
+                AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum);
+            }
             if (gPartyMenu.layout != PARTY_LAYOUT_LINK_PREVIEW)
                 PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
@@ -2459,7 +2480,7 @@ static void CreateLinkBattlePreviewIcons(void)
 
         if (species != SPECIES_NONE)
         {
-            u8 spriteId = CreateMonIconNoPersonality(species, SpriteCB_MonIcon, 144, sPartyMenuBoxes[i].spriteCoords[1], 4);
+            u8 spriteId = CreateMonIconNoPersonality(species, SpriteCallbackDummy, 144, sPartyMenuBoxes[i].spriteCoords[1], 4);
             gSprites[spriteId].oam.priority = 1;
             CreateLinkBattlePreviewTypeIcons(species, i, TRUE);
         }
@@ -2478,7 +2499,7 @@ static void CreateLinkBattlePreviewCursor(void)
 
     LoadSpriteSheet(&sLinkBattlePreviewCursorSheet);
     LoadSpritePalette(&sLinkBattlePreviewCursorPalette);
-    spriteId = CreateSprite(&sLinkBattlePreviewCursorTemplate, 16, sPartyMenuBoxes[0].spriteCoords[1], 0);
+    spriteId = CreateSprite(&sLinkBattlePreviewCursorTemplate, 16, sPartyMenuBoxes[0].spriteCoords[1] - 8, 0);
     if (spriteId != MAX_SPRITES)
         StartSpriteAnim(&gSprites[spriteId], 0);
 }
@@ -2495,7 +2516,7 @@ static void SpriteCB_LinkBattlePreviewCursor(struct Sprite *sprite)
 
     sprite->invisible = FALSE;
     sprite->x = sPartyMenuBoxes[slot].spriteCoords[0];
-    sprite->y = sPartyMenuBoxes[slot].spriteCoords[1];
+    sprite->y = sPartyMenuBoxes[slot].spriteCoords[1] - 8;
 }
 
 static void CreateLinkBattlePreviewTypeIcons(u16 species, u8 slot, bool8 isOpponent)
@@ -4597,7 +4618,9 @@ static void CreatePartyMonIconSpriteParameterized(u16 species, u32 pid, struct P
 {
     if (species != SPECIES_NONE)
     {
-        menuBox->monSpriteId = CreateMonIcon(species, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, pid);
+        void (*callback)(struct Sprite *) = (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW) ? SpriteCallbackDummy : SpriteCB_MonIcon;
+
+        menuBox->monSpriteId = CreateMonIcon(species, callback, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, pid);
         gSprites[menuBox->monSpriteId].oam.priority = priority;
     }
 }

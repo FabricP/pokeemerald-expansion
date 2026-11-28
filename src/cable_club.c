@@ -3,12 +3,14 @@
 #include "battle.h"
 #include "battle_records.h"
 #include "battle_setup.h"
+#include "bg.h"
 #include "cable_club.h"
 #include "data.h"
 #include "event_data.h"
 #include "field_message_box.h"
 #include "field_specials.h"
 #include "field_weather.h"
+#include "gpu_regs.h"
 #include "international_string_util.h"
 #include "link.h"
 #include "link_rfu.h"
@@ -26,14 +28,40 @@
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
+#include "text.h"
+#include "text_window.h"
 #include "trade.h"
 #include "trainer_card.h"
 #include "party_menu.h"
 #include "window.h"
 #include "constants/battle_frontier.h"
 #include "constants/cable_club.h"
+#include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+
+static const struct BgTemplate sCableClubTeamSelectionBgTemplates[] = {
+    {
+        .bg = 0,
+        .charBaseIndex = 3,
+        .mapBaseIndex = 31
+    }
+};
+
+static const struct WindowTemplate sCableClubTeamSelectionWindowTemplates[] = {
+    {
+        .bg = 0,
+        .tilemapLeft = 3,
+        .tilemapTop = 15,
+        .width = 24,
+        .height = 4,
+        .paletteNum = 14,
+        .baseBlock = 0x014
+    },
+    DUMMY_WIN_TEMPLATE
+};
+
+static const u8 sCableClubTeamSelectionTextColors[] = { TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY };
 
 static const struct WindowTemplate sWindowTemplate_LinkPlayerCount = {
     .bg = 0,
@@ -73,6 +101,7 @@ static void Task_ReestablishLinkAwaitConfirmation(u8 taskId);
 static void CB2_CableClubTeamSelectionResult(void);
 static void CB2_RunCableClubBattleTask(void);
 static void BeginCableClubTeamSelection(u8 taskId, u8 resumeState);
+static void VBlankCB_CableClubTeamSelection(void);
 
 #define tState      data[0]
 
@@ -881,30 +910,84 @@ static void CB2_CableClubTeamSelectionResult(void)
     switch (gMain.state)
     {
     case 0:
-        memset(gBlockSendBuffer, 0, 0x20);
-        gBlockSendBuffer[0] = (gSelectedOrderFromParty[0] != 0);
-        if (SendBlock(0, gBlockSendBuffer, 0x20))
-            gMain.state++;
+        SetGpuReg(REG_OFFSET_DISPCNT, 0);
+        ResetBgsAndClearDma3BusyFlags(0);
+        InitBgsFromTemplates(0, sCableClubTeamSelectionBgTemplates, ARRAY_COUNT(sCableClubTeamSelectionBgTemplates));
+        ResetTempTileDataBuffers();
+        FreeAllSpritePalettes();
+        if (!InitWindows(sCableClubTeamSelectionWindowTemplates))
+            break;
+        DeactivateAllTextPrinters();
+        ClearWindowTilemap(0);
+        FillWindowPixelBuffer(0, PIXEL_FILL(0));
+        FillBgTilemapBufferRect(0, 0, 0, 0, DISPLAY_TILE_WIDTH, DISPLAY_TILE_HEIGHT, 0xF);
+        LoadUserWindowBorderGfx(0, 1, BG_PLTT_ID(13));
+        LoadUserWindowBorderGfx_(0, 1, BG_PLTT_ID(13));
+        Menu_LoadStdPal();
+        SetVBlankCallback(VBlankCB_CableClubTeamSelection);
+        gMain.state++;
         break;
     case 1:
-        if ((GetBlockReceivedStatus() & receivedPlayers) == receivedPlayers)
+        DrawTextBorderOuter(0, 0x001, 0xD);
+        FillWindowPixelBuffer(0, (sCableClubTeamSelectionTextColors[0] << 4) | sCableClubTeamSelectionTextColors[0]);
+        AddTextPrinterParameterized4(0, FONT_NORMAL, 0, 1, 0, 1, sCableClubTeamSelectionTextColors, 0, gText_CommStandbyAwaitingOtherPlayer);
+        PutWindowTilemap(0);
+        CopyWindowToVram(0, COPYWIN_FULL);
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
+        ShowBg(0);
+        gMain.state++;
+        break;
+    case 2:
+        if (HasLinkErrorOccurred() || !gReceivedRemoteLinkPlayers || GetLinkPlayerCount() != 2)
+        {
+            gLinkBattleTeamSelectionCount = 0;
+            SetCloseLinkCallback();
+            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+            gMain.state = 5;
+        }
+        else if (!gPaletteFade.active && !IsTextPrinterActive(0))
+        {
+            memset(gBlockSendBuffer, 0, 0x20);
+            gBlockSendBuffer[0] = (gSelectedOrderFromParty[0] != 0);
+            if (SendBlock(0, gBlockSendBuffer, 0x20))
+                gMain.state++;
+        }
+        break;
+    case 3:
+        if (HasLinkErrorOccurred() || !gReceivedRemoteLinkPlayers || GetLinkPlayerCount() != 2)
+        {
+            gLinkBattleTeamSelectionCount = 0;
+            SetCloseLinkCallback();
+            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+            gMain.state = 5;
+        }
+        else if ((GetBlockReceivedStatus() & receivedPlayers) == receivedPlayers)
         {
             remoteId = GetMultiplayerId() ^ 1;
             ResetBlockReceivedFlags();
             if (gBlockRecvBuffer[remoteId][0] != 0 && gSelectedOrderFromParty[0] != 0)
             {
-                gTasks[sCableClubTeamSelectionTaskId].tState = sCableClubTeamSelectionResumeState;
-                SetMainCallback2(CB2_RunCableClubBattleTask);
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+                gMain.state++;
             }
             else
             {
+                gLinkBattleTeamSelectionCount = 0;
                 SetCloseLinkCallback();
-                gMain.state++;
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+                gMain.state = 5;
             }
         }
         break;
-    case 2:
-        if (!gReceivedRemoteLinkPlayers)
+    case 4:
+        if (!gPaletteFade.active)
+        {
+            gTasks[sCableClubTeamSelectionTaskId].tState = sCableClubTeamSelectionResumeState;
+            SetMainCallback2(CB2_RunCableClubBattleTask);
+        }
+        break;
+    case 5:
+        if (!gPaletteFade.active && !gReceivedRemoteLinkPlayers)
         {
             LoadPlayerParty();
             gLinkBattleTeamSelectionCount = 0;
@@ -918,6 +1001,13 @@ static void CB2_CableClubTeamSelectionResult(void)
     AnimateSprites();
     BuildOamBuffer();
     UpdatePaletteFade();
+}
+
+static void VBlankCB_CableClubTeamSelection(void)
+{
+    LoadOam();
+    ProcessSpriteCopyRequests();
+    TransferPlttBuffer();
 }
 
 static void CB2_RunCableClubBattleTask(void)

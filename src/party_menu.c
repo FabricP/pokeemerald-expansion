@@ -455,6 +455,9 @@ static void CB2_ExchangeLinkBattleParty(void);
 static void CB2_LinkBattlePartySelectorExit(void);
 static void RenderLinkBattlePartyMenuBox(u8);
 static void DrawLinkBattleOpponentPreview(void);
+static void CreateLinkBattlePreviewIcons(void);
+static void CreateLinkBattlePreviewTypeIcons(u16, u8, bool8);
+static void CreateLinkBattlePreviewTypeIcon(u8, s16, s16);
 static bool8 GetBattleEntryEligibility(struct Pokemon *);
 static bool8 HasPartySlotAlreadyBeenSelected(u8);
 static u8 GetBattleEntryLevelCap(void);
@@ -691,6 +694,8 @@ static bool8 ShowPartyMenu(void)
         break;
     case 14:
         LoadMonIconPalettes();
+        if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+            CreateLinkBattlePreviewIcons();
         gMain.state++;
         break;
     case 15:
@@ -797,6 +802,8 @@ static bool8 ReloadPartyMenu(void)
         break;
     case 12:
         LoadMonIconPalettes();
+        if (gPartyMenu.layout == PARTY_LAYOUT_LINK_PREVIEW)
+            CreateLinkBattlePreviewIcons();
         gMain.state++;
         break;
     case 13:
@@ -1057,10 +1064,8 @@ static void RenderLinkBattlePartyMenuBox(u8 slot)
         if (order != 0)
         {
             ConvertIntToDecimalStringN(gStringVar2, order, STR_CONV_MODE_LEFT_ALIGN, 1);
-            AddTextPrinterParameterized3(windowId, FONT_SMALL, 22, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar2);
+            AddTextPrinterParameterized3(windowId, FONT_SMALL, 28, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar2);
         }
-        GetMonNickname(mon, gStringVar1);
-        AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar1, FONT_SMALL, 0, 72), 32, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar1);
     }
 
     PutWindowTilemap(windowId);
@@ -2369,10 +2374,6 @@ static void InitPartyMenuWindows(u8 layout)
 static void DrawLinkBattleOpponentPreview(void)
 {
     u8 i;
-    u16 species;
-    u16 type;
-    u16 type2;
-    u8 *typesString;
 
     for (i = 0; i < 2; i++)
     {
@@ -2390,26 +2391,60 @@ static void DrawLinkBattleOpponentPreview(void)
         u8 windowId = sLinkBattleOpponentWindowIds[i];
 
         FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-        species = gLinkBattleOpponentPartySpecies[i];
-        if (species != SPECIES_NONE)
-        {
-            StringCopy(gStringVar1, GetSpeciesName(species));
-            type = GetSpeciesType(species, 0);
-            type2 = GetSpeciesType(species, 1);
-            StringCopy(gStringVar2, gTypesInfo[type].name);
-            if (type2 != type)
-            {
-                typesString = gStringVar2 + StringLength(gStringVar2);
-                *typesString++ = CHAR_SLASH;
-                *typesString = EOS;
-                StringAppend(gStringVar2, gTypesInfo[type2].name);
-            }
-            AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar1, FONT_SMALL, 0, 92), 2, 0, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar1);
-            AddTextPrinterParameterized3(windowId, GetFontIdToFit(gStringVar2, FONT_SMALL, 0, 92), 2, 8, sFontColorTable[0], TEXT_SKIP_DRAW, gStringVar2);
-        }
         PutWindowTilemap(windowId);
         CopyWindowToVram(windowId, COPYWIN_FULL);
     }
+}
+
+static void CreateLinkBattlePreviewIcons(void)
+{
+    u8 i;
+
+    LoadCompressedSpriteSheet(&gSpriteSheet_MoveTypes);
+    LoadPalette(gMoveTypes_Pal, OBJ_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u16 species = gLinkBattleOpponentPartySpecies[i];
+
+        if (species != SPECIES_NONE)
+        {
+            u8 spriteId = CreateMonIconNoPersonality(species, SpriteCB_MonIcon, 144, sPartyMenuBoxes[i].spriteCoords[1], 4);
+            gSprites[spriteId].oam.priority = 1;
+            CreateLinkBattlePreviewTypeIcons(species, i, TRUE);
+        }
+
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+        if (species != SPECIES_NONE)
+            CreateLinkBattlePreviewTypeIcons(species, i, FALSE);
+    }
+}
+
+static void CreateLinkBattlePreviewTypeIcons(u16 species, u8 slot, bool8 isOpponent)
+{
+    u8 type1 = GetSpeciesType(species, 0);
+    u8 type2 = GetSpeciesType(species, 1);
+    s16 y = sPartyMenuBoxes[slot].spriteCoords[1];
+    s16 singleTypeX = isOpponent ? 200 : 80;
+    s16 firstTypeX = isOpponent ? 184 : 64;
+    s16 secondTypeX = isOpponent ? 216 : 96;
+
+    if (type1 == type2)
+    {
+        CreateLinkBattlePreviewTypeIcon(type1, singleTypeX, y);
+    }
+    else
+    {
+        CreateLinkBattlePreviewTypeIcon(type1, firstTypeX, y);
+        CreateLinkBattlePreviewTypeIcon(type2, secondTypeX, y);
+    }
+}
+
+static void CreateLinkBattlePreviewTypeIcon(u8 type, s16 x, s16 y)
+{
+    u8 spriteId = CreateSprite(&gSpriteTemplate_MoveTypes, x, y, 2);
+
+    StartSpriteAnim(&gSprites[spriteId], type);
+    gSprites[spriteId].oam.paletteNum = gTypesInfo[type].palette;
 }
 
 static void LoadPartyMenuWindows(void)
